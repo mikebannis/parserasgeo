@@ -8,6 +8,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
+
 class CrossSectionNotFound(Exception):
     pass
 
@@ -22,11 +23,15 @@ class CrossSection(object):
         self.channel_length = None
         self.rob_length = None
 
-        self.gis_cut_line = []
         self.last_edit = ''
         self.sta_elev = []
         self.horizontal_mann = True
         self.mannings_n = []
+
+        # ------ GIS cut lines
+        self.num_cutline_pts = None
+        self.gis_cut_line = []  # [(x1,y1),(x2,y2),(x3,y3),...] Values are currently stored as strings
+
         ##### IEFA stuff
 
         #### Block obstruction stuff
@@ -40,31 +45,47 @@ class CrossSection(object):
         self.contract_coeff = 0
 
     def import_geo(self, line, geo_file):
-        # Parse first line
+        # ---------Parse first line
         fields = line[23:].split(',')
         assert len(fields) == 5
         vals = [_fl_int(x) for x in fields]
-
         # Node type and cross section id
         self.node_type = vals[0]
         self.xs_id = vals[1]
-
         # Reach lengths
         self.lob_length = vals[2]
         self.channel_length = vals[3]
         self.rob_length = vals[4]
 
+        # --- Description
+        self.temp_lines0 = ''
+        line = next(geo_file)
+        while line[:15] != 'XS GIS Cut Line':
+            self.temp_lines0 += line
+            line = next(geo_file)
+
+        # ---- GIS Cut line
+        vals = line.split('=')
+        assert vals[0] == 'XS GIS Cut Line' and len(vals) == 2
+        self.num_cutline_pts = int(vals[1])
+        line = next(geo_file)
+        while line[:16] != 'Node Last Edited':
+            vals = _split_by_n_str(line,16)
+            for i in range(0, len(vals), 2):
+                self.gis_cut_line.append((vals[i], vals[i+1]))
+            line = next(geo_file)
+        assert self.gis_cut_line is not []
+
         # store unused lines
         self.temp_lines = ''
-        line = next(geo_file)
         while line[:5] != '#Mann':
             self.temp_lines += line
             line = next(geo_file)
 
-        # parse manning's n values
+        # --- parse manning's n values
         line = self._import_manning_n(line, geo_file)
 
-        # store more blank lines
+        # store more unused lines
         self.temp_lines2 = ''
         while line[:9] != 'Bank Sta=':
             self.temp_lines2 += line
@@ -73,7 +94,7 @@ class CrossSection(object):
         # import bank stations
         line = self._import_bank_sta(line, geo_file)
 
-        # store more blank lines
+        # store more unused lines
         self.temp_lines3 = ''
         while line != '\n':
             self.temp_lines3 += line
@@ -122,6 +143,19 @@ class CrossSection(object):
         s += str(self.node_type) + ' ,'
         s += '{:<8}'.format(str(self.xs_id)) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
+
+        # temp_lines0
+        for line in self.temp_lines0:
+            s += line
+
+        # GIS cut line
+        s += 'XS GIS Cut Line='+str(self.num_cutline_pts)+'\n'
+        pts = [self.gis_cut_line[i:i+2] for i in range(0, len(self.gis_cut_line), 2)]
+        for pt in pts:
+            if len(pt) == 2:
+                s += pt[0][0] + pt[0][1] + pt[1][0] + pt[1][1] + '\n'
+            else:
+                s += pt[0][0] + pt[0][1] + '\n'
 
         # temp_lines
         for line in self.temp_lines:
@@ -213,6 +247,12 @@ def _split_by_16(line):
 
 
 def _split_by_n(line, n):
+    """
+
+    :param line:
+    :param n:
+    :return:
+    """
     values = []
     line = line[:-1]
     length = len(line)
@@ -223,6 +263,23 @@ def _split_by_n(line, n):
             values.append(_fl_int(line[i:]))
     return values
 
+
+def _split_by_n_str(line, n):
+    """
+    Splits line in to a list of n length strings.
+    :param line:  string
+    :param n: int
+    :return: list of strings
+    """
+    values = []
+    line = line[:-1]
+    length = len(line)
+    for i in range(0, length, n):
+        if i+n < length:
+            values.append(line[i:i+n])
+        else:
+            values.append(line[i:])
+    return values
 
 def _fl_int(value):
     """ Converts string to either float or int depending on precense of decimal point.
@@ -269,8 +326,10 @@ def main():
 
     xs_list = extract_xs(geo_list)
     for xs in xs_list:
-        print xs.xs_id
+        print '\nXS ID:', xs.xs_id
         print xs.mannings_n
+        print xs.num_cutline_pts
+        print xs.gis_cut_line
     print len(xs_list)
 
     # for x in geo_list:
