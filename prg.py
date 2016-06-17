@@ -58,6 +58,7 @@ class CrossSection(object):
         self.rob_length = vals[4]
 
         # --- Description
+        # TODO - make this store the description in a variable
         self.temp_lines0 = ''
         line = next(geo_file)
         while line[:15] != 'XS GIS Cut Line':
@@ -74,7 +75,7 @@ class CrossSection(object):
             for i in range(0, len(vals), 2):
                 self.gis_cut_line.append((vals[i], vals[i+1]))
             line = next(geo_file)
-        assert self.gis_cut_line is not []
+        assert self.gis_cut_line != []
 
         # store unused lines
         self.temp_lines = ''
