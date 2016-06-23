@@ -8,6 +8,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
+# TODO - create geolist object
 
 class CrossSectionNotFound(Exception):
     pass
@@ -266,6 +267,7 @@ def return_xs_by_id(geo_list, xs_id):
                 return item
     raise CrossSectionNotFound
 
+
 def extract_xs(geo_list):
     """
     :param geo_list: list of RAS geometry from import_ras_geo()
@@ -276,6 +278,36 @@ def extract_xs(geo_list):
         if isinstance(item, CrossSection):
             new_geo_list.append(item)
     return new_geo_list
+
+
+def number_xs(geo_list):
+    """
+    Returns the number of cross sections in geo_list
+    :param geo_list: list from import_ras_geo
+    :return: number (int) of XS in geolist
+    """
+    xs_list = extract_xs(geo_list)
+    return len(xs_list)
+
+
+def is_xs_duplicate(geo_list, xs_id):
+    """
+    Checks for duplicate cross sections in geo_list
+    rasises CrossSectionNotFound if xs_id is not found
+    :param geo_list: from import_ras_geo
+    :return: True if duplicate
+    """
+    xs_list = extract_xs(geo_list)
+    count = 0
+    for xs in xs_list:
+        if xs.xs_id == xs_id:
+            count += 1
+    if count > 1:
+        return True
+    elif count == 1:
+        return False
+    else:
+        raise CrossSectionNotFound
 
 
 def _xs_test(test_line):
