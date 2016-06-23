@@ -26,7 +26,7 @@ class CrossSection(object):
         self.last_edit = ''
         self.sta_elev = []
         self.horizontal_mann = True
-        self.mannings_n = []
+        self.mannings_n = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
 
         # ------ GIS cut lines
         self.num_cutline_pts = None
@@ -34,7 +34,10 @@ class CrossSection(object):
 
         ##### IEFA stuff
 
-        #### Block obstruction stuff
+        # --- Block obstruction stuff
+        self.num_blocked = None
+        self.blocked_type = None
+        self.blocked = []  # [(start_sta1, end_sta1, elev1), (start_sta2, end_sta2, elev2), ...]
 
         self.l_bank_sta = 0
         self.r_bank_sta = 0
@@ -86,6 +89,16 @@ class CrossSection(object):
         # --- parse manning's n values
         line = self._import_manning_n(line, geo_file)
 
+        # # store more unused lines
+        # self.temp_lines1 = ''
+        # while line[:16] != '#Blocked Obstruct=':
+        #     self.temp_lines1 += line
+        #     line = next(geo_file)
+
+        # --- parse blocked obstructions
+        if line[:16] == '#Block Obstruct=':
+            line = self._import_blocked(line, geo_file)
+
         # store more unused lines
         self.temp_lines2 = ''
         while line[:9] != 'Bank Sta=':
@@ -135,7 +148,32 @@ class CrossSection(object):
                 self.mannings_n.append((values[i], values[i+1], values[i+2]))
             line = next(geo_file)
         assert test_length == len(self.mannings_n)
+        return line
 
+    def _import_blocked(self, line, geo_file):
+        """
+        Imports reads blocked obstructions info from geo_file
+        :param line: next line from geo_file
+        :param geo_file: File object
+        :return: returns last read lien from geo_file
+        """
+        print line
+        values = line.split(',')
+        self.num_blocked = int(values[0][-3:])
+        self.blocked_type = int(values[1])
+        if self.blocked_type == 0:
+            print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
+            temp = raw_input()
+
+        line = next(geo_file)
+        while line[:1] == ' ' or line[:1].isdigit():
+            print line
+            values = _split_by_8(line)
+            assert len(values) % 3 == 0
+            for i in range(0, len(values), 3):
+                self.blocked.append((values[i], values[i+1], values[i+2]))
+            line = next(geo_file)
+        assert self.num_blocked == len(self.blocked)
         return line
 
     def __str__(self):
@@ -170,6 +208,14 @@ class CrossSection(object):
         temp_str = _print_list_by_group(n_list, 8, 9)
         temp_str = temp_str.replace(' 0.', '  .')
         s += temp_str
+
+        # temp_lines1
+        # for line in self.temp_lines1:
+        #     s += line
+
+        # Blocked obstructions
+        if self.num_blocked is not None:
+            s += '1'
 
         # temp_lines2
         for line in self.temp_lines2:
@@ -282,6 +328,7 @@ def _split_by_n_str(line, n):
             values.append(line[i:])
     return values
 
+
 def _fl_int(value):
     """ Converts string to either float or int depending on precense of decimal point.
     The RAS geo file does not have a decimal place if it is not needed. weird.
@@ -321,6 +368,8 @@ def _print_list_by_group(values, width, num_columns):
 
 def main():
     infile = 'GHC_working.g43'
+    infile = 'GHC_FHAD.g01'
+    #infile = 'CCRCCombinedwith.g06'
     outfile = 'test.out'
 
     geo_list = import_ras_geo(infile)
@@ -329,8 +378,9 @@ def main():
     for xs in xs_list:
         print '\nXS ID:', xs.xs_id
         print xs.mannings_n
-        print xs.num_cutline_pts
-        print xs.gis_cut_line
+        print xs.num_blocked
+        print xs.blocked_type
+        print xs.blocked
     print len(xs_list)
 
     # for x in geo_list:
