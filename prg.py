@@ -10,14 +10,54 @@ Version 0.01
 
 # TODO - create geolist object
 
+
 class CrossSectionNotFound(Exception):
     pass
+
+
+class RiverReach(object):
+    """
+    Holds data for River Reach (name, georef'd line)
+    """
+    def __init__(self):
+        self.river_name = None
+        self.reach_name = None
+        self.geo = []  # list of tuples (x, y)
+        self.text_location = None  # tuple of location (x, y)
+        self.reverse_text = None  # Boolean
+
+    @staticmethod
+    def test(line):
+        """
+        Tests "line" to see if it is the first line of a river/reach block
+        :param line: string
+        :return boolean - true if first line of river/reach, otherwise false
+        """
+        if line[:12] == 'River Reach=':
+            return True
+        else:
+            return False
+
+    # TODO: remove this line once RiverReach is fully implemented
+    @staticmethod
+    def get_river_reach(line):
+        """
+        returns name of river and reach from first line of river/reach block.
+        :param line: string
+        :return: river, reach - strings
+        """
+        fields = line.split('=')[1].split(',')
+        river = fields[0].strip()
+        reach = fields[1].strip()
+        return river, reach
 
 
 class CrossSection(object):
     """ Holds info for cross section in HEC-RAS geometry file
     """
-    def __init__(self):
+    def __init__(self, river, reach):
+        self.river = river
+        self.reach = reach
         self.xs_id = None
         self.node_type = None
         self.lob_length = None
@@ -242,11 +282,18 @@ def import_ras_geo(geo_filename):
     geo_list = []
     num_xs = 0
     num_unknown = 0
+    river = None
+    reach = None
 
     with open(geo_filename, 'rt') as geo_file:
         for line in geo_file:
-            if _xs_test(line):
-                xs = CrossSection()
+            if RiverReach.test(line):
+                river, reach = RiverReach.get_river_reach(line)
+                print river, reach
+                geo_list.append(line)
+                num_unknown += 1
+            elif _xs_test(line):
+                xs = CrossSection(river, reach)
                 xs.import_geo(line, geo_file)
                 num_xs += 1
                 geo_list.append(xs)
