@@ -115,7 +115,7 @@ class CrossSection(object):
         self.num_cutline_pts = int(vals[1])
         line = next(geo_file)
         while line[:16] != 'Node Last Edited':
-            vals = _split_by_n_str(line,16)
+            vals = _split_by_n_str(line, 16)
             for i in range(0, len(vals), 2):
                 self.gis_cut_line.append((vals[i], vals[i+1]))
             line = next(geo_file)
@@ -138,8 +138,8 @@ class CrossSection(object):
 
         # --- parse blocked obstructions
         # TODO: make normal obstructions work as well
-        # if line[:16] == '#Block Obstruct=':
-        #     line = self._import_blocked(line, geo_file)
+        if line[:16] == '#Block Obstruct=':
+            line = self._import_blocked(line, geo_file)
 
         # store more unused lines
         self.temp_lines2 = ''
@@ -203,23 +203,28 @@ class CrossSection(object):
         values = line.split(',')
         self.num_blocked = int(values[0][-3:])
         self.blocked_type = int(values[1])
-        if self.blocked_type == 0:
-            # print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
-            temp = raw_input()
-            line = next(geo_file)
-            while line[:1] == ' ' or line[:1].isdigit():
-                line = next(geo_file)
-            return line
 
         line = next(geo_file)
-        while line[:1] == ' ' or line[:1].isdigit():
-            # print line
-            values = _split_by_8(line)
-            assert len(values) % 3 == 0
-            for i in range(0, len(values), 3):
-                self.blocked.append((values[i], values[i+1], values[i+2]))
-            line = next(geo_file)
-        assert self.num_blocked == len(self.blocked)
+        if self.blocked_type == 0:  # Normal blocked obstructions
+            print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
+            #temp = raw_input()
+            while line[:1] == ' ' or line[:1].isdigit():
+                print line
+                values = _split_block_obs(line, 8)
+                assert len(values) == 6
+                for i in range(0, len(values), 3):
+                    self.blocked.append((values[i], values[i+1], values[i+2]))
+                line = next(geo_file)
+        else:    # Multiple blocked obstructions
+            print 'normal obstruction'
+            while line[:1] == ' ' or line[:1].isdigit():
+                # print line
+                values = _split_by_8(line)
+                assert len(values) % 3 == 0
+                for i in range(0, len(values), 3):
+                    self.blocked.append((values[i], values[i+1], values[i+2]))
+                line = next(geo_file)
+            assert self.num_blocked == len(self.blocked)
         return line
 
     def __str__(self):
@@ -259,6 +264,7 @@ class CrossSection(object):
         # for line in self.temp_lines1:
         #     s += line
 
+        # TODO: fix this!
         # Blocked obstructions
         if self.num_blocked is not None:
             s += '1'
@@ -413,6 +419,28 @@ def _split_by_n_str(line, n):
     return values
 
 
+def _split_block_obs(line, n):
+    """
+
+    :param line:
+    :param n:
+    :return:
+    """
+    values = []
+    line = line[:-1]
+    length = len(line)
+    for i in range(0, length, n):
+        if i+n < length:
+            new_value = line[i:i+n].strip()
+        else:
+            new_value = line[i:].strip()
+        if new_value == '':
+            values.append(new_value)
+        else:
+            values.append(_fl_int(new_value))
+
+    return values
+
 def _fl_int(value):
     """ Converts string to either float or int depending on precense of decimal point.
     The RAS geo file does not have a decimal place if it is not needed. weird.
@@ -453,19 +481,20 @@ def _print_list_by_group(values, width, num_columns):
 def main():
     infile = 'GHC_working.g43'
     infile = 'GHC_FHAD.g01'
-    infile = 'CCRCCombinedwith.g06'
+    infile = 'test/CCRC_prg_test.g01'
     outfile = 'test.out'
 
     geo_list = import_ras_geo(infile)
 
     xs_list = extract_xs(geo_list)
-    if not True:
+    if True:
         for xs in xs_list:
-            print '\nXS ID:', xs.xs_id
-            print xs.mannings_n
-            print xs.num_blocked
-            print xs.blocked_type
-            print xs.blocked
+            if xs.num_blocked is not None and xs.blocked_type == 0:
+                print '\nXS ID:', xs.xs_id
+                print xs.mannings_n
+                print xs.num_blocked
+                print xs.blocked_type
+                print xs.blocked
     print len(xs_list)
 
     # for x in geo_list:

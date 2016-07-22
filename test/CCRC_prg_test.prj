@@ -1,12 +1,14 @@
 Proj Title=CCRC_prg_test
-Current Plan=p02
+Current Plan=p01
 Default Exp/Contr=0.3,0.1
 English Units
 Geom File=g06
+Geom File=g01
 Flow File=f03
 Flow File=f04
 Plan File=p02
 Plan File=p03
+Plan File=p01
 Y Axis Title=Elevation
 X Axis Title(PF)=Main Channel Distance
 X Axis Title(XS)=Station
@@ -21,7 +23,7 @@ DSS Export Filename=
 DSS Export Rating Curves= 0 
 DSS Export Rating Curve Sorted= 0 
 DSS Export Volume Flow Curves= 0 
-DXF Filename=z:\UDFCD PLANNING\Coal Creek-Rock Creek\02 HYDRAULICS\HECRASv4.1.0\Models Combined with Splits 020314\testprofile.dxf
+DXF Filename=testprofile.dxf
 DXF OffsetX= 0 
 DXF OffsetY= 0 
 DXF ScaleX= 1 
