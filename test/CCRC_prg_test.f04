@@ -1,0 +1,130 @@
+Flow Title=Floodway Combined
+Program Version=4.10
+Number of Profiles= 2 
+Profile Names=100-Year,Floodway
+River Rch & RM=287 Split,Main            ,404581  
+    1294    1294
+River Rch & RM=Coal Creek,Main            ,134702  
+    3590    3590
+River Rch & RM=Coal Creek,Main            ,122078  
+    3740    3740
+River Rch & RM=Coal Creek,Main            ,107917  
+    3740    3740
+River Rch & RM=Coal Creek,Main            ,104986  
+    3740    3740
+River Rch & RM=Coal Creek,Main            ,102154  
+    3740    3740
+River Rch & RM=Coal Creek,Main            ,87521   
+    4650    4650
+River Rch & RM=Coal Creek,Main            ,81153   
+    4930    4930
+River Rch & RM=Coal Creek,Main            ,76304   
+    5190    5190
+River Rch & RM=Coal Creek,Main            ,72504   
+    5630    5630
+River Rch & RM=Coal Creek,Main            ,67891   
+   12500   12500
+River Rch & RM=Coal Creek,Lower           ,66572   
+   12500   12500
+River Rch & RM=Coal Creek,Lower           ,53821   
+   12700   12700
+River Rch & RM=Coal Creek,Lower           ,11593   
+    2920    2920
+River Rch & RM=Coal Creek,Lower           ,9736    
+    1505    1505
+River Rch & RM=Coal Creek,Lower           ,8490    
+    5330    5330
+River Rch & RM=Coal Creek,Lower           ,8215    
+    8010    8010
+River Rch & RM=Coal Creek,Lower           ,6503    
+   12700   12700
+River Rch & RM=OldTownSplit,Erie            ,304312  
+       1       1
+River Rch & RM=OldTownSplit,Erie            ,301608  
+       1       1
+River Rch & RM=Rock Creek,Main            ,270732  
+    1190    1190
+River Rch & RM=Rock Creek,Main            ,263735  
+    1400    1400
+River Rch & RM=Rock Creek,Main            ,257486  
+    1740    1740
+River Rch & RM=Rock Creek,Main            ,252180  
+    2310    2310
+River Rch & RM=Rock Creek,Main            ,251419  
+    2750    2750
+River Rch & RM=Rock Creek,Main            ,245621  
+    3720    3720
+River Rch & RM=Rock Creek,Main            ,241667  
+    4520    4520
+River Rch & RM=Rock Creek,Main            ,228859  
+    7170    7170
+River Rch & RM=Rock Creek,Main            ,217781  
+    9580    9580
+River Rch & RM=Rock Creek,Main            ,213487  
+   10100   10100
+River Rch & RM=Rock Creek,Main            ,200182  
+   12500   12500
+River Rch & RM=RRSplit,Split           ,504270  
+    9780    9780
+River Rch & RM=RRSplit,Split           ,502149  
+   11200   11200
+River Rch & RM=RRSplit,Split           ,502025  
+    7380    7380
+River Rch & RM=RRSplit,Split           ,501482  
+    4700    4700
+Boundary for River Rch & Prof#=287 Split,Main            , 1 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=5188.95
+Boundary for River Rch & Prof#=287 Split,Main            , 2 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=5188.95
+Boundary for River Rch & Prof#=Coal Creek,Main            , 1 
+Up Type= 3 
+Up Slope=0.01
+Dn Type= 0 
+Boundary for River Rch & Prof#=Coal Creek,Main            , 2 
+Up Type= 3 
+Up Slope=0.01
+Dn Type= 0 
+Boundary for River Rch & Prof#=Coal Creek,Lower           , 1 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=4960.2
+Boundary for River Rch & Prof#=Coal Creek,Lower           , 2 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=4960.2
+Boundary for River Rch & Prof#=OldTownSplit,Erie            , 1 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=5010
+Boundary for River Rch & Prof#=OldTownSplit,Erie            , 2 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=5010
+Boundary for River Rch & Prof#=Rock Creek,Main            , 1 
+Up Type= 3 
+Up Slope=0.01
+Dn Type= 0 
+Boundary for River Rch & Prof#=Rock Creek,Main            , 2 
+Up Type= 3 
+Up Slope=0.01
+Dn Type= 0 
+Boundary for River Rch & Prof#=RRSplit,Split           , 1 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=4991.37
+Boundary for River Rch & Prof#=RRSplit,Split           , 2 
+Up Type= 0 
+Dn Type= 1 
+Dn Known WS=4991.37
+DSS Import StartDate=
+DSS Import StartTime=
+DSS Import EndDate=
+DSS Import EndTime=
+DSS Import GetInterval= 0 
+DSS Import Interval=
+DSS Import GetPeak= 0 
+DSS Import FillOption= 0 

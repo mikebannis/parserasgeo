@@ -97,8 +97,9 @@ class CrossSection(object):
         #     line = next(geo_file)
 
         # --- parse blocked obstructions
-        if line[:16] == '#Block Obstruct=':
-            line = self._import_blocked(line, geo_file)
+        # TODO: make normal obstructions work as well
+        # if line[:16] == '#Block Obstruct=':
+        #     line = self._import_blocked(line, geo_file)
 
         # store more unused lines
         self.temp_lines2 = ''
@@ -158,17 +159,21 @@ class CrossSection(object):
         :param geo_file: File object
         :return: returns last read lien from geo_file
         """
-        print line
+        # print line
         values = line.split(',')
         self.num_blocked = int(values[0][-3:])
         self.blocked_type = int(values[1])
         if self.blocked_type == 0:
-            print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
+            # print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
             temp = raw_input()
+            line = next(geo_file)
+            while line[:1] == ' ' or line[:1].isdigit():
+                line = next(geo_file)
+            return line
 
         line = next(geo_file)
         while line[:1] == ' ' or line[:1].isdigit():
-            print line
+            # print line
             values = _split_by_8(line)
             assert len(values) % 3 == 0
             for i in range(0, len(values), 3):
@@ -345,7 +350,7 @@ def _split_by_n(line, n):
 
 def _split_by_n_str(line, n):
     """
-    Splits line in to a list of n length strings.
+    Splits line in to a list of n length strings. This differs from _split_by_n(
     :param line:  string
     :param n: int
     :return: list of strings
@@ -401,18 +406,19 @@ def _print_list_by_group(values, width, num_columns):
 def main():
     infile = 'GHC_working.g43'
     infile = 'GHC_FHAD.g01'
-    #infile = 'CCRCCombinedwith.g06'
+    infile = 'CCRCCombinedwith.g06'
     outfile = 'test.out'
 
     geo_list = import_ras_geo(infile)
 
     xs_list = extract_xs(geo_list)
-    for xs in xs_list:
-        print '\nXS ID:', xs.xs_id
-        print xs.mannings_n
-        print xs.num_blocked
-        print xs.blocked_type
-        print xs.blocked
+    if not True:
+        for xs in xs_list:
+            print '\nXS ID:', xs.xs_id
+            print xs.mannings_n
+            print xs.num_blocked
+            print xs.blocked_type
+            print xs.blocked
     print len(xs_list)
 
     # for x in geo_list:

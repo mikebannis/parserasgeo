@@ -1,0 +1,36 @@
+Proj Title=CCRC_prg_test
+Current Plan=p02
+Default Exp/Contr=0.3,0.1
+English Units
+Geom File=g06
+Flow File=f03
+Flow File=f04
+Plan File=p02
+Plan File=p03
+Y Axis Title=Elevation
+X Axis Title(PF)=Main Channel Distance
+X Axis Title(XS)=Station
+BEGIN DESCRIPTION:
+		
+END DESCRIPTION:
+DSS Start Date=
+DSS Start Time=
+DSS End Date=
+DSS End Time=
+DSS Export Filename=
+DSS Export Rating Curves= 0 
+DSS Export Rating Curve Sorted= 0 
+DSS Export Volume Flow Curves= 0 
+DXF Filename=z:\UDFCD PLANNING\Coal Creek-Rock Creek\02 HYDRAULICS\HECRASv4.1.0\Models Combined with Splits 020314\testprofile.dxf
+DXF OffsetX= 0 
+DXF OffsetY= 0 
+DXF ScaleX= 1 
+DXF ScaleY= 20 
+GIS Export Reach=Coal Creek      ,Main            
+GIS Export Reach=Coal Creek      ,Lower           
+GIS Export Reach=Rock Creek      ,Main            
+GIS Export Reach=287 Split       ,Main            
+GIS Export Reach=OldTownSplit    ,Erie            
+GIS Export Reach=RRSplit         ,Split           
+GIS Export Profiles= 1 
+       3
