@@ -2,27 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b90adc9-fc25-42f7-bdc9-4901abb35528" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.O01" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.O02" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.O03" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.f03" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.f04" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.g01" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.g06" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.g06.tmp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.p01" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.p01.comp_msgs.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.p02" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.p02.comp_msgs.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.p03" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.prj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.r01" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/CCRC_prg_test.r02" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/parse ras geo.iml" afterPath="$PROJECT_DIR$/.idea/parse ras geo.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/geo_test.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prg.py" afterPath="$PROJECT_DIR$/prg.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.out" afterPath="$PROJECT_DIR$/test.out" />
     </list>
     <ignored path="parse ras geo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -56,9 +38,21 @@
       <file leaf-file-name="prg.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/prg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="495" column="5" selection-start-line="495" selection-start-column="5" selection-end-line="495" selection-end-column="5" />
+            <state relative-caret-position="179">
+              <caret line="505" column="21" selection-start-line="505" selection-start-column="16" selection-end-line="505" selection-end-column="21" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="geo_test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/geo_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -81,6 +75,7 @@
         <option value="$PROJECT_DIR$/test_script.py" />
         <option value="$PROJECT_DIR$/get_reach_lengths.py" />
         <option value="$PROJECT_DIR$/geos/CCRCCombinedwith.g06" />
+        <option value="$PROJECT_DIR$/test/geo_test.py" />
         <option value="$PROJECT_DIR$/prg.py" />
       </list>
     </option>
@@ -122,6 +117,30 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="parse ras geo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="parserasgeo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="parse ras geo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="parserasgeo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scratches" />
@@ -134,7 +153,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="FullScreen" value="true" />
   </component>
-  <component name="RunManager" selected="Python.prg">
+  <component name="RunManager" selected="Python.geo_test">
     <configuration default="false" name="prg" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -182,6 +201,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="parse ras geo" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/get_reach_lengths.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="geo_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="parse ras geo" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/geo_test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -320,16 +356,18 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="Python.prg" />
       <item index="1" class="java.lang.String" itemvalue="Python.test_script" />
       <item index="2" class="java.lang.String" itemvalue="Python.get_reach_lengths" />
+      <item index="3" class="java.lang.String" itemvalue="Python.geo_test" />
     </list>
     <recent_temporary>
-      <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.prg" />
-        <item index="1" class="java.lang.String" itemvalue="Python.get_reach_lengths" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test_script" />
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="Python.geo_test" />
+        <item index="1" class="java.lang.String" itemvalue="Python.prg" />
+        <item index="2" class="java.lang.String" itemvalue="Python.get_reach_lengths" />
+        <item index="3" class="java.lang.String" itemvalue="Python.test_script" />
       </list>
     </recent_temporary>
   </component>
@@ -351,14 +389,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37632135" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37632135" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4448052" sideWeight="0.5021075" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3121469" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3120482" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2879518" sideWeight="0.49789253" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28674698" sideWeight="0.49789253" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24947146" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -653,10 +691,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/geo_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="13" selection-start-line="19" selection-start-column="13" selection-end-line="19" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/prg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="495" column="5" selection-start-line="495" selection-start-column="5" selection-end-line="495" selection-end-column="5" />
+        <state relative-caret-position="179">
+          <caret line="505" column="21" selection-start-line="505" selection-start-column="16" selection-end-line="505" selection-end-column="21" />
           <folding />
         </state>
       </provider>

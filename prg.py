@@ -206,17 +206,17 @@ class CrossSection(object):
 
         line = next(geo_file)
         if self.blocked_type == 0:  # Normal blocked obstructions
-            print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
+            #print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
             #temp = raw_input()
             while line[:1] == ' ' or line[:1].isdigit():
-                print line
+                #print line
                 values = _split_block_obs(line, 8)
                 assert len(values) == 6
                 for i in range(0, len(values), 3):
                     self.blocked.append((values[i], values[i+1], values[i+2]))
                 line = next(geo_file)
         else:    # Multiple blocked obstructions
-            print 'normal obstruction'
+            #print 'normal obstruction'
             while line[:1] == ' ' or line[:1].isdigit():
                 # print line
                 values = _split_by_8(line)
@@ -298,7 +298,7 @@ def import_ras_geo(geo_filename):
         for line in geo_file:
             if RiverReach.test(line):
                 river, reach = RiverReach.get_river_reach(line)
-                print river, reach
+                #print river, reach
                 geo_list.append(line)
                 num_unknown += 1
             elif _xs_test(line):
@@ -310,8 +310,8 @@ def import_ras_geo(geo_filename):
                 # Unknown line encountered. Store it as text.
                 geo_list.append(line)
                 num_unknown += 1
-    print str(num_xs)+' cross sections imported'
-    print str(num_unknown) + ' unknown lines imported'
+    #print str(num_xs)+' cross sections imported'
+    #print str(num_unknown) + ' unknown lines imported'
     return geo_list
 
 
