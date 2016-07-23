@@ -267,7 +267,10 @@ class CrossSection(object):
         # TODO: fix this!
         # Blocked obstructions
         if self.num_blocked is not None:
-            s += '1'
+            # unpack tuples
+            blocked_list = [x for tup in self.blocked for x in tup]
+            s += '#Block Obstruct=' + _pad_left(self.num_blocked, 2) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
+            s += _print_list_by_group(blocked_list, 8, 9)
 
         # temp_lines2
         for line in self.temp_lines2:
@@ -455,7 +458,7 @@ def _fl_int(value):
 
 def _print_list_by_group(values, width, num_columns):
     """
-    Returns string of items in list values padded to width in width, with num_columns of items per line.
+    Returns string of items in list values padded left to width in width, with num_columns of items per line.
     Lines are separated by newlines. No error thrown if value[i] width exceeds width.
 
     :param values: list of values to convert to string
@@ -478,18 +481,28 @@ def _print_list_by_group(values, width, num_columns):
     return s
 
 
+def _pad_left(guts, pad_number):
+    """
+    pads guts (left) with spaces up to pad_number
+    :param guts: anything
+    :param pad_number: int
+    :return: string
+    """
+    return ('{:>'+str(pad_number)+'}').format(guts)
+
+
 def main():
-    infile = 'GHC_working.g43'
-    infile = 'GHC_FHAD.g01'
-    infile = 'test/CCRC_prg_test.g01'
-    outfile = 'test.out'
+    infile = 'geos/201601BigDryCreek.g27'
+    #infile = 'geos/GHC_FHAD.g01'
+    #infile = 'test/CCRC_prg_test.g01'
+    outfile = 'test/test.out'
 
     geo_list = import_ras_geo(infile)
 
     xs_list = extract_xs(geo_list)
     if True:
         for xs in xs_list:
-            if xs.num_blocked is not None and xs.blocked_type == 0:
+            if xs.num_blocked is not None: # and xs.blocked_type == 0:
                 print '\nXS ID:', xs.xs_id
                 print xs.mannings_n
                 print xs.num_blocked
