@@ -73,6 +73,10 @@ class CrossSection(object):
         self.num_cutline_pts = None
         self.gis_cut_line = []  # [(x1,y1),(x2,y2),(x3,y3),...] Values are currently stored as strings
 
+        # ------ Station/Elevation data
+        self.num_sta_elev_pts = None  # int
+        self.sta_elev_pts = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
+
         ##### IEFA stuff
 
         # --- Block obstruction stuff
@@ -121,23 +125,19 @@ class CrossSection(object):
             line = next(geo_file)
         assert self.gis_cut_line != []
 
-        # store unused lines
+        # store unused lines - Node Last Edited & sta-elev points
         self.temp_lines = ''
-        while line[:5] != '#Mann':
+        while line[:9] != '#Sta/Elev':
             self.temp_lines += line
             line = next(geo_file)
+
+        # --- Store sta/elev points
+        line = self._import_sta_elev(line, geo_file)
 
         # --- parse manning's n values
         line = self._import_manning_n(line, geo_file)
 
-        # # store more unused lines
-        # self.temp_lines1 = ''
-        # while line[:16] != '#Blocked Obstruct=':
-        #     self.temp_lines1 += line
-        #     line = next(geo_file)
-
         # --- parse blocked obstructions
-        # TODO: make normal obstructions work as well
         if line[:16] == '#Block Obstruct=':
             line = self._import_blocked(line, geo_file)
 
@@ -171,6 +171,41 @@ class CrossSection(object):
         self.r_bank_sta = _fl_int(values[1])
         return next(geo_file)
 
+    def _import_blocked(self, line, geo_file):
+        """
+        Imports reads blocked obstructions info from geo_file
+        :param line: next line from geo_file
+        :param geo_file: File object
+        :return: returns last read lien from geo_file
+        """
+        # print line
+        values = line.split(',')
+        self.num_blocked = int(values[0][-3:])
+        self.blocked_type = int(values[1])
+
+        line = next(geo_file)
+        if self.blocked_type == 0:  # Normal blocked obstructions
+            # print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
+            # temp = raw_input()
+            while line[:1] == ' ' or line[:1].isdigit():
+                # print line
+                values = _split_block_obs(line, 8)
+                assert len(values) == 6
+                for i in range(0, len(values), 3):
+                    self.blocked.append((values[i], values[i + 1], values[i + 2]))
+                line = next(geo_file)
+        else:  # Multiple blocked obstructions
+            # print 'normal obstruction'
+            while line[:1] == ' ' or line[:1].isdigit():
+                # print line
+                values = _split_by_8(line)
+                assert len(values) % 3 == 0
+                for i in range(0, len(values), 3):
+                    self.blocked.append((values[i], values[i + 1], values[i + 2]))
+                line = next(geo_file)
+            assert self.num_blocked == len(self.blocked)
+        return line
+
     def _import_manning_n(self, line, geo_file):
         # Parse manning's n header line
         fields = line[6:].split(',')
@@ -192,39 +227,22 @@ class CrossSection(object):
         assert test_length == len(self.mannings_n)
         return line
 
-    def _import_blocked(self, line, geo_file):
+    def _import_sta_elev(self, line, geo_file):
         """
-        Imports reads blocked obstructions info from geo_file
-        :param line: next line from geo_file
-        :param geo_file: File object
-        :return: returns last read lien from geo_file
+        Import XS station/elevation points.
+        :param line: current line of geo_file
+        :param geo_file: geometry file object
+        :return: line in geo_file after sta/elev data
         """
-        # print line
-        values = line.split(',')
-        self.num_blocked = int(values[0][-3:])
-        self.blocked_type = int(values[1])
-
+        # #Sta/Elev= 142
+        self.num_sta_elev_pts = int(line[10:])
         line = next(geo_file)
-        if self.blocked_type == 0:  # Normal blocked obstructions
-            #print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
-            #temp = raw_input()
-            while line[:1] == ' ' or line[:1].isdigit():
-                #print line
-                values = _split_block_obs(line, 8)
-                assert len(values) == 6
-                for i in range(0, len(values), 3):
-                    self.blocked.append((values[i], values[i+1], values[i+2]))
-                line = next(geo_file)
-        else:    # Multiple blocked obstructions
-            #print 'normal obstruction'
-            while line[:1] == ' ' or line[:1].isdigit():
-                # print line
-                values = _split_by_8(line)
-                assert len(values) % 3 == 0
-                for i in range(0, len(values), 3):
-                    self.blocked.append((values[i], values[i+1], values[i+2]))
-                line = next(geo_file)
-            assert self.num_blocked == len(self.blocked)
+        while line[:6] != '#Mann=':
+            vals = _split_by_n(line, 8)
+            for i in range(0, len(vals), 2):
+                self.sta_elev_pts.append((vals[i], vals[i + 1]))
+            line = next(geo_file)
+        assert len(self.sta_elev_pts) == self.num_sta_elev_pts
         return line
 
     def __str__(self):
@@ -251,20 +269,22 @@ class CrossSection(object):
         for line in self.temp_lines:
             s += line
 
-        # Manning's n header
+        # --- Sta/elevation points
+        s += '#Sta/Elev= ' + str(self.num_sta_elev_pts) + ' \n'
+        # unpack tuples
+        sta_elev_list = [x for tup in self.sta_elev_pts for x in tup]
+        # convert to padded columns of 8 
+        temp_str = _print_list_by_group(sta_elev_list, 8, 10)
+        s += temp_str
+
+        # --- Manning's n header
         s += '#Mann= ' + str(len(self.mannings_n)) + ' ,{:>2} , 0 \n'.format(self.horizontal_mann)
         # n-values - unpack tuples
         n_list = [x for tup in self.mannings_n for x in tup]
-        # convert to padded columns of 8 - fix RAS decimal silliness
+        # convert to padded columns of 8
         temp_str = _print_list_by_group(n_list, 8, 9)
-        temp_str = temp_str.replace(' 0.', '  .')
         s += temp_str
 
-        # temp_lines1
-        # for line in self.temp_lines1:
-        #     s += line
-
-        # TODO: fix this!
         # Blocked obstructions
         if self.num_blocked is not None:
             # unpack tuples
@@ -475,7 +495,14 @@ def _print_list_by_group(values, width, num_columns):
             last_column = num_columns
         # Loop through and add every item in the row
         for column in range(0, last_column):
-            s += ('{:>'+str(width)+'}').format(values[row + column])
+            temp = ('{:>'+str(width)+'}').format(values[row + column])
+
+            # Strip leading 0 from 0.12345 - with or without spaces
+            if temp[:2] == '0.':
+                temp = temp[1:]
+            temp = temp.replace(' 0.', '  .')
+
+            s += temp
         # End of row, add newline
         s += '\n'
     return s
@@ -502,12 +529,14 @@ def main():
     xs_list = extract_xs(geo_list)
     if True:
         for xs in xs_list:
-            if xs.num_blocked is not None: # and xs.blocked_type == 0:
                 print '\nXS ID:', xs.xs_id
-                print xs.mannings_n
-                print xs.num_blocked
-                print xs.blocked_type
-                print xs.blocked
+                #print xs.mannings_n
+                #print xs.num_blocked
+                #print xs.blocked_type
+                #print xs.blocked
+                print xs.num_sta_elev_pts
+                print len(xs.sta_elev_pts)
+                print xs.sta_elev_pts
     print len(xs_list)
 
     # for x in geo_list:

@@ -1,6 +1,7 @@
 import glob
 import sys
 import filecmp
+import subprocess
 sys.path.insert(0, '..')
 
 import prg
@@ -19,6 +20,8 @@ def main():
             print 'Geometry file', test_file, 'exported correctly.'
         else:
             print 'WARNING: file', test_file, 'did not export properly'
+            subprocess.Popen(["diff", test_file, outfile])
+            sys.exit('WARNING: file' + test_file + 'did not export properly')
 
 if __name__ == '__main__':
     main()
