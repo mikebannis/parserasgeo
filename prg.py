@@ -64,8 +64,7 @@ class CrossSection(object):
         self.channel_length = None
         self.rob_length = None
 
-        self.last_edit = ''
-        self.sta_elev = []
+        # self.last_edit = ''
         self.horizontal_mann = True
         self.mannings_n = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
 
