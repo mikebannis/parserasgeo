@@ -355,6 +355,14 @@ def return_xs_by_id(geo_list, xs_id):
     raise CrossSectionNotFound
 
 
+def return_xs(geo_list, xs_id, river, reach):
+    for item in geo_list:
+        if isinstance(item, CrossSection):
+            if item.xs_id == xs_id and item.river == river and item.reach == reach:
+                return item
+    raise CrossSectionNotFound
+
+
 def extract_xs(geo_list):
     """
     :param geo_list: list of RAS geometry from import_ras_geo()
