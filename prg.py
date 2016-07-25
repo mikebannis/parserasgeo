@@ -137,6 +137,12 @@ class CrossSection(object):
         # --- parse manning's n values
         line = self._import_manning_n(line, geo_file)
 
+        # store more unused lines
+        self.temp_lines1 = ''
+        while line[:16] != '#Block Obstruct=' and line[:9] != 'Bank Sta=':
+            self.temp_lines1 += line
+            line = next(geo_file)
+
         # --- parse blocked obstructions
         if line[:16] == '#Block Obstruct=':
             line = self._import_blocked(line, geo_file)
@@ -185,8 +191,6 @@ class CrossSection(object):
 
         line = next(geo_file)
         if self.blocked_type == 0:  # Normal blocked obstructions
-            # print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
-            # temp = raw_input()
             while line[:1] == ' ' or line[:1].isdigit():
                 # print line
                 values = _split_block_obs(line, 8)
@@ -195,9 +199,7 @@ class CrossSection(object):
                     self.blocked.append((values[i], values[i + 1], values[i + 2]))
                 line = next(geo_file)
         else:  # Multiple blocked obstructions
-            # print 'normal obstruction'
             while line[:1] == ' ' or line[:1].isdigit():
-                # print line
                 values = _split_by_8(line)
                 assert len(values) % 3 == 0
                 for i in range(0, len(values), 3):
@@ -285,11 +287,15 @@ class CrossSection(object):
         temp_str = _print_list_by_group(n_list, 8, 9)
         s += temp_str
 
+        # temp_lines1
+        for line in self.temp_lines1:
+            s += line
+
         # Blocked obstructions
         if self.num_blocked is not None:
             # unpack tuples
             blocked_list = [x for tup in self.blocked for x in tup]
-            s += '#Block Obstruct=' + _pad_left(self.num_blocked, 2) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
+            s += '#Block Obstruct= ' + str(self.num_blocked) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
             s += _print_list_by_group(blocked_list, 8, 9)
 
         # temp_lines2
@@ -522,6 +528,7 @@ def main():
     infile = 'geos/201601BigDryCreek.g27'
     #infile = 'geos/GHC_FHAD.g01'
     #infile = 'test/CCRC_prg_test.g01'
+    infile = 'geos/SBK_PMR.g02'
     outfile = 'test/test.out'
 
     geo_list = import_ras_geo(infile)
@@ -531,12 +538,12 @@ def main():
         for xs in xs_list:
                 print '\nXS ID:', xs.xs_id
                 #print xs.mannings_n
-                #print xs.num_blocked
-                #print xs.blocked_type
-                #print xs.blocked
-                print xs.num_sta_elev_pts
-                print len(xs.sta_elev_pts)
-                print xs.sta_elev_pts
+                print xs.num_blocked
+                print xs.blocked_type
+                print xs.blocked
+                # print xs.num_sta_elev_pts
+                # print len(xs.sta_elev_pts)
+                # print xs.sta_elev_pts
     print len(xs_list)
 
     # for x in geo_list:
