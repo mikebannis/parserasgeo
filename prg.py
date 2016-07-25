@@ -552,10 +552,11 @@ def _print_list_by_group(values, width, num_columns):
         for column in range(0, last_column):
             temp = ('{:>'+str(width)+'}').format(values[row + column])
 
-            # Strip leading 0 from 0.12345 - with or without spaces
+            # Strip leading 0 from 0.12345 - with or without spaces or '-'
             if temp[:2] == '0.':
                 temp = temp[1:]
             temp = temp.replace(' 0.', '  .')
+            temp = temp.replace('-0.', ' -.')
 
             s += temp
         # End of row, add newline
