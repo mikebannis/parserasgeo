@@ -64,8 +64,7 @@ class CrossSection(object):
         self.channel_length = None
         self.rob_length = None
 
-        self.last_edit = ''
-        self.sta_elev = []
+        # self.last_edit = ''
         self.horizontal_mann = True
         self.mannings_n = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
 
@@ -77,7 +76,11 @@ class CrossSection(object):
         self.num_sta_elev_pts = None  # int
         self.sta_elev_pts = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
 
-        ##### IEFA stuff
+        # --- IEFA
+        self.num_iefa = None
+        self.iefa_type = None
+        self.iefa = []
+        self.iefa_permanence = []  # TODO: implement
 
         # --- Block obstruction stuff
         self.num_blocked = None
@@ -137,6 +140,22 @@ class CrossSection(object):
         # --- parse manning's n values
         line = self._import_manning_n(line, geo_file)
 
+        # store more unused lines
+        self.temp_lines1 = ''
+        while line[:16] != '#Block Obstruct=' and line[:9] != 'Bank Sta=' and line[:10] != '#XS Ineff=':
+            self.temp_lines1 += line
+            line = next(geo_file)
+
+        # --- Parse IEFA
+        if line[:10] == '#XS Ineff=':
+            line = self._import_iefa(line, geo_file)
+
+        # store more unused lines
+        self.temp_lines1B = ''
+        while line[:16] != '#Block Obstruct=' and line[:9] != 'Bank Sta=':
+            self.temp_lines1B += line
+            line = next(geo_file)
+
         # --- parse blocked obstructions
         if line[:16] == '#Block Obstruct=':
             line = self._import_blocked(line, geo_file)
@@ -178,32 +197,45 @@ class CrossSection(object):
         :param geo_file: File object
         :return: returns last read lien from geo_file
         """
-        # print line
         values = line.split(',')
         self.num_blocked = int(values[0][-3:])
         self.blocked_type = int(values[1])
 
         line = next(geo_file)
-        if self.blocked_type == 0:  # Normal blocked obstructions
-            # print 'Found normal blocked obstructions, this is not implemented yet! Press enter to continue...'
-            # temp = raw_input()
-            while line[:1] == ' ' or line[:1].isdigit():
-                # print line
-                values = _split_block_obs(line, 8)
-                assert len(values) == 6
-                for i in range(0, len(values), 3):
-                    self.blocked.append((values[i], values[i + 1], values[i + 2]))
-                line = next(geo_file)
-        else:  # Multiple blocked obstructions
-            # print 'normal obstruction'
-            while line[:1] == ' ' or line[:1].isdigit():
-                # print line
-                values = _split_by_8(line)
-                assert len(values) % 3 == 0
-                for i in range(0, len(values), 3):
-                    self.blocked.append((values[i], values[i + 1], values[i + 2]))
-                line = next(geo_file)
-            assert self.num_blocked == len(self.blocked)
+        # Due to possible missing elevation all values must be treated as strings
+        while line[:1] == ' ' or line[:1].isdigit():
+            values = _split_block_obs(line, 8)
+            assert len(values) % 3 == 0
+            for i in range(0, len(values), 3):
+                self.blocked.append((values[i], values[i + 1], values[i + 2]))
+            line = next(geo_file)
+        assert self.num_blocked == len(self.blocked)
+        return line
+
+    def _import_iefa(self, line, geo_file):
+        """
+        Imports reads IEFA info from geo_file
+        :param line: next line from geo_file
+        :param geo_file: File object
+        :return: returns last read line from geo_file
+        """
+        # TODO: add support for permanent/non-permanent. Currently ignored
+        values = line.split(',')
+        self.num_iefa = int(values[0][-3:])
+        self.iefa_type = int(values[1])
+        # if True:
+        #     print self.river, self.reach, self.xs_id
+        #     print line
+        line = next(geo_file)
+        # Due to possible blank lines in geometry file, all data must be treated as a string
+        while line[:1] == ' ' or line[:1].isdigit():
+            # print line
+            values = _split_block_obs(line, 8)
+            assert len(values) % 3 == 0
+            for i in range(0, len(values), 3):
+                self.iefa.append((values[i], values[i + 1], values[i + 2]))
+            line = next(geo_file)
+        assert self.num_iefa == len(self.iefa)
         return line
 
     def _import_manning_n(self, line, geo_file):
@@ -285,11 +317,25 @@ class CrossSection(object):
         temp_str = _print_list_by_group(n_list, 8, 9)
         s += temp_str
 
+        # temp_lines1
+        for line in self.temp_lines1:
+            s += line
+
+        # --- IEFA
+        if self.num_iefa is not None:
+            # unpack tuples
+            iefa_list = [x for tup in self.iefa for x in tup]
+            s += '#XS Ineff= ' + str(self.num_iefa) + ' ,' + _pad_left(self.iefa_type, 2) + ' \n'
+            s += _print_list_by_group(iefa_list, 8, 9)
+
+        for line in self.temp_lines1B:
+            s += line
+
         # Blocked obstructions
         if self.num_blocked is not None:
             # unpack tuples
             blocked_list = [x for tup in self.blocked for x in tup]
-            s += '#Block Obstruct=' + _pad_left(self.num_blocked, 2) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
+            s += '#Block Obstruct= ' + str(self.num_blocked) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
             s += _print_list_by_group(blocked_list, 8, 9)
 
         # temp_lines2
@@ -345,6 +391,14 @@ def return_xs_by_id(geo_list, xs_id):
     for item in geo_list:
         if isinstance(item, CrossSection):
             if item.xs_id == xs_id:
+                return item
+    raise CrossSectionNotFound
+
+
+def return_xs(geo_list, xs_id, river, reach):
+    for item in geo_list:
+        if isinstance(item, CrossSection):
+            if item.xs_id == xs_id and item.river == river and item.reach == reach:
                 return item
     raise CrossSectionNotFound
 
@@ -444,7 +498,7 @@ def _split_by_n_str(line, n):
 
 def _split_block_obs(line, n):
     """
-
+    Also used for iefa
     :param line:
     :param n:
     :return:
@@ -497,10 +551,11 @@ def _print_list_by_group(values, width, num_columns):
         for column in range(0, last_column):
             temp = ('{:>'+str(width)+'}').format(values[row + column])
 
-            # Strip leading 0 from 0.12345 - with or without spaces
+            # Strip leading 0 from 0.12345 - with or without spaces or '-'
             if temp[:2] == '0.':
                 temp = temp[1:]
             temp = temp.replace(' 0.', '  .')
+            temp = temp.replace('-0.', ' -.')
 
             s += temp
         # End of row, add newline
@@ -522,22 +577,30 @@ def main():
     infile = 'geos/201601BigDryCreek.g27'
     #infile = 'geos/GHC_FHAD.g01'
     #infile = 'test/CCRC_prg_test.g01'
+    infile = 'geos/SBK_PMR.g02'
     outfile = 'test/test.out'
 
     geo_list = import_ras_geo(infile)
 
     xs_list = extract_xs(geo_list)
     if True:
+        iefa_count = 0
         for xs in xs_list:
+            if xs.num_iefa is not None:
+                iefa_count +=1
                 print '\nXS ID:', xs.xs_id
                 #print xs.mannings_n
-                #print xs.num_blocked
-                #print xs.blocked_type
-                #print xs.blocked
-                print xs.num_sta_elev_pts
-                print len(xs.sta_elev_pts)
-                print xs.sta_elev_pts
+                # print xs.num_blocked
+                # print xs.blocked_type
+                # print xs.blocked
+                # print xs.num_sta_elev_pts
+                # print len(xs.sta_elev_pts)
+                # print xs.sta_elev_pts
+                print xs.num_iefa
+                print xs.iefa_type
+                print xs.iefa
     print len(xs_list)
+    print iefa_count, 'cross sections with iefa'
 
     # for x in geo_list:
     #     if isinstance(x, CrossSection):
