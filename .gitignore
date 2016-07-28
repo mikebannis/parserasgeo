@@ -2,4 +2,8 @@
 .idea/* 
 .idea/*.*
 geos
-goes/*.*
+geos/*.*
+geos-old
+geos-old/*.*
+test/prg_test.g00
+
