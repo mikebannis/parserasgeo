@@ -8,6 +8,8 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
+from features import CrossSection
+
 # TODO - create geolist object
 
 
@@ -52,7 +54,7 @@ class RiverReach(object):
         return river, reach
 
 
-class CrossSection(object):
+class OldCrossSection(object):
     """ Holds info for cross section in HEC-RAS geometry file
     """
     def __init__(self, river, reach):
@@ -77,36 +79,36 @@ class CrossSection(object):
         self.sta_elev_pts = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
 
         # --- IEFA
-        self.num_iefa = None
-        self.iefa_type = None
-        self.iefa = []
-        self.iefa_permanence = []  # TODO: implement
+        # self.num_iefa = None
+        # self.iefa_type = None
+        # self.iefa = []
+        # self.iefa_permanence = []  # TODO: implement
 
         # --- Block obstruction stuff
-        self.num_blocked = None
-        self.blocked_type = None
-        self.blocked = []  # [(start_sta1, end_sta1, elev1), (start_sta2, end_sta2, elev2), ...]
-
-        self.l_bank_sta = 0
-        self.r_bank_sta = 0
+        # self.num_blocked = None
+        # self.blocked_type = None
+        # self.blocked = []  # [(start_sta1, end_sta1, elev1), (start_sta2, end_sta2, elev2), ...]
+        #
+        # self.l_bank_sta = 0
+        # self.r_bank_sta = 0
 
         ### XS Ration Curve stuff
 
-        self.exp_coeff = 0
-        self.contract_coeff = 0
+        # self.exp_coeff = 0
+        # self.contract_coeff = 0
 
     def import_geo(self, line, geo_file):
-        # ---------Parse first line
-        fields = line[23:].split(',')
-        assert len(fields) == 5
-        vals = [_fl_int(x) for x in fields]
-        # Node type and cross section id
-        self.node_type = vals[0]
-        self.xs_id = vals[1]
-        # Reach lengths
-        self.lob_length = vals[2]
-        self.channel_length = vals[3]
-        self.rob_length = vals[4]
+        # # ---------Parse first line
+        # fields = line[23:].split(',')
+        # assert len(fields) == 5
+        # vals = [_fl_int(x) for x in fields]
+        # # Node type and cross section id
+        # self.node_type = vals[0]
+        # self.xs_id = vals[1]
+        # # Reach lengths
+        # self.lob_length = vals[2]
+        # self.channel_length = vals[3]
+        # self.rob_length = vals[4]
 
         # --- Description
         # TODO - make this store the description in a variable
@@ -117,16 +119,16 @@ class CrossSection(object):
             line = next(geo_file)
 
         # ---- GIS Cut line
-        vals = line.split('=')
-        assert vals[0] == 'XS GIS Cut Line' and len(vals) == 2
-        self.num_cutline_pts = int(vals[1])
-        line = next(geo_file)
-        while line[:16] != 'Node Last Edited':
-            vals = _split_by_n_str(line, 16)
-            for i in range(0, len(vals), 2):
-                self.gis_cut_line.append((vals[i], vals[i+1]))
-            line = next(geo_file)
-        assert self.gis_cut_line != []
+        # vals = line.split('=')
+        # assert vals[0] == 'XS GIS Cut Line' and len(vals) == 2
+        # self.num_cutline_pts = int(vals[1])
+        # line = next(geo_file)
+        # while line[:16] != 'Node Last Edited':
+        #     vals = _split_by_n_str(line, 16)
+        #     for i in range(0, len(vals), 2):
+        #         self.gis_cut_line.append((vals[i], vals[i+1]))
+        #     line = next(geo_file)
+        # assert self.gis_cut_line != []
 
         # store unused lines - Node Last Edited & sta-elev points
         self.temp_lines = ''
@@ -147,8 +149,8 @@ class CrossSection(object):
             line = next(geo_file)
 
         # --- Parse IEFA
-        if line[:10] == '#XS Ineff=':
-            line = self._import_iefa(line, geo_file)
+        # if line[:10] == '#XS Ineff=':
+        #     line = self._import_iefa(line, geo_file)
 
         # store more unused lines
         self.temp_lines1B = ''
@@ -157,17 +159,17 @@ class CrossSection(object):
             line = next(geo_file)
 
         # --- parse blocked obstructions
-        if line[:16] == '#Block Obstruct=':
-            line = self._import_blocked(line, geo_file)
+        # if line[:16] == '#Block Obstruct=':
+        #     line = self._import_blocked(line, geo_file)
 
         # store more unused lines
-        self.temp_lines2 = ''
-        while line[:9] != 'Bank Sta=':
-            self.temp_lines2 += line
-            line = next(geo_file)
-
-        # import bank stations
-        line = self._import_bank_sta(line, geo_file)
+        # self.temp_lines2 = ''
+        # while line[:9] != 'Bank Sta=':
+        #     self.temp_lines2 += line
+        #     line = next(geo_file)
+        #
+        # # import bank stations
+        # line = self._import_bank_sta(line, geo_file)
 
         # store more unused lines
         self.temp_lines3 = ''
@@ -183,12 +185,12 @@ class CrossSection(object):
         :return: returns the next line in geo_file
         """
         # Strip header
-        line = line[9:]
-        values = line.split(',')
-        assert len(values) == 2
-        self.l_bank_sta = _fl_int(values[0])
-        self.r_bank_sta = _fl_int(values[1])
-        return next(geo_file)
+        # line = line[9:]
+        # values = line.split(',')
+        # assert len(values) == 2
+        # self.l_bank_sta = _fl_int(values[0])
+        # self.r_bank_sta = _fl_int(values[1])
+        # return next(geo_file)
 
     def _import_blocked(self, line, geo_file):
         """
@@ -197,20 +199,20 @@ class CrossSection(object):
         :param geo_file: File object
         :return: returns last read lien from geo_file
         """
-        values = line.split(',')
-        self.num_blocked = int(values[0][-3:])
-        self.blocked_type = int(values[1])
-
-        line = next(geo_file)
-        # Due to possible missing elevation all values must be treated as strings
-        while line[:1] == ' ' or line[:1].isdigit():
-            values = _split_block_obs(line, 8)
-            assert len(values) % 3 == 0
-            for i in range(0, len(values), 3):
-                self.blocked.append((values[i], values[i + 1], values[i + 2]))
-            line = next(geo_file)
-        assert self.num_blocked == len(self.blocked)
-        return line
+        # values = line.split(',')
+        # self.num_blocked = int(values[0][-3:])
+        # self.blocked_type = int(values[1])
+        #
+        # line = next(geo_file)
+        # # Due to possible missing elevation all values must be treated as strings
+        # while line[:1] == ' ' or line[:1].isdigit():
+        #     values = _split_block_obs(line, 8)
+        #     assert len(values) % 3 == 0
+        #     for i in range(0, len(values), 3):
+        #         self.blocked.append((values[i], values[i + 1], values[i + 2]))
+        #     line = next(geo_file)
+        # assert self.num_blocked == len(self.blocked)
+        # return line
 
     def _import_iefa(self, line, geo_file):
         """
@@ -279,23 +281,23 @@ class CrossSection(object):
 
     def __str__(self):
         # Header
-        s = 'Type RM Length L Ch R = '
-        s += str(self.node_type) + ' ,'
-        s += '{:<8}'.format(str(self.xs_id)) + ','
-        s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
+        # s = 'Type RM Length L Ch R = '
+        # s += str(self.node_type) + ' ,'
+        # s += '{:<8}'.format(str(self.xs_id)) + ','
+        # s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
 
         # temp_lines0
         for line in self.temp_lines0:
             s += line
 
         # GIS cut line
-        s += 'XS GIS Cut Line='+str(self.num_cutline_pts)+'\n'
-        pts = [self.gis_cut_line[i:i+2] for i in range(0, len(self.gis_cut_line), 2)]
-        for pt in pts:
-            if len(pt) == 2:
-                s += pt[0][0] + pt[0][1] + pt[1][0] + pt[1][1] + '\n'
-            else:
-                s += pt[0][0] + pt[0][1] + '\n'
+        # s += 'XS GIS Cut Line='+str(self.num_cutline_pts)+'\n'
+        # pts = [self.gis_cut_line[i:i+2] for i in range(0, len(self.gis_cut_line), 2)]
+        # for pt in pts:
+        #     if len(pt) == 2:
+        #         s += pt[0][0] + pt[0][1] + pt[1][0] + pt[1][1] + '\n'
+        #     else:
+        #         s += pt[0][0] + pt[0][1] + '\n'
 
         # temp_lines
         for line in self.temp_lines:
@@ -322,28 +324,28 @@ class CrossSection(object):
             s += line
 
         # --- IEFA
-        if self.num_iefa is not None:
-            # unpack tuples
-            iefa_list = [x for tup in self.iefa for x in tup]
-            s += '#XS Ineff= ' + str(self.num_iefa) + ' ,' + _pad_left(self.iefa_type, 2) + ' \n'
-            s += _print_list_by_group(iefa_list, 8, 9)
+        # if self.num_iefa is not None:
+        #     # unpack tuples
+        #     iefa_list = [x for tup in self.iefa for x in tup]
+        #     s += '#XS Ineff= ' + str(self.num_iefa) + ' ,' + _pad_left(self.iefa_type, 2) + ' \n'
+        #     s += _print_list_by_group(iefa_list, 8, 9)
 
         for line in self.temp_lines1B:
             s += line
 
-        # Blocked obstructions
-        if self.num_blocked is not None:
-            # unpack tuples
-            blocked_list = [x for tup in self.blocked for x in tup]
-            s += '#Block Obstruct= ' + str(self.num_blocked) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
-            s += _print_list_by_group(blocked_list, 8, 9)
+        # # Blocked obstructions
+        # if self.num_blocked is not None:
+        #     # unpack tuples
+        #     blocked_list = [x for tup in self.blocked for x in tup]
+        #     s += '#Block Obstruct= ' + str(self.num_blocked) + ' ,' + _pad_left(self.blocked_type, 2) + ' \n'
+        #     s += _print_list_by_group(blocked_list, 8, 9)
 
         # temp_lines2
         for line in self.temp_lines2:
             s += line
 
         # Banks stations
-        s += 'Bank Sta='+str(self.l_bank_sta)+','+str(self.r_bank_sta)+'\n'
+        # s += 'Bank Sta='+str(self.l_bank_sta)+','+str(self.r_bank_sta)+'\n'
 
         # temp_lines3
         for line in self.temp_lines3:
@@ -578,6 +580,7 @@ def main():
     #infile = 'geos/GHC_FHAD.g01'
     #infile = 'test/CCRC_prg_test.g01'
     infile = 'geos/SBK_PMR.g02'
+    infile = 'geos/GHC_working.g43'
     outfile = 'test/test.out'
 
     geo_list = import_ras_geo(infile)
@@ -586,46 +589,35 @@ def main():
     if True:
         iefa_count = 0
         for xs in xs_list:
-            if xs.num_iefa is not None:
+            if xs.obstruct.blocked_type is not None:
                 iefa_count +=1
-                print '\nXS ID:', xs.xs_id
-                #print xs.mannings_n
-                # print xs.num_blocked
-                # print xs.blocked_type
-                # print xs.blocked
-                # print xs.num_sta_elev_pts
-                # print len(xs.sta_elev_pts)
-                # print xs.sta_elev_pts
-                print xs.num_iefa
-                print xs.iefa_type
-                print xs.iefa
-    print len(xs_list)
-    print iefa_count, 'cross sections with iefa'
+                print '\nXS ID:', xs.header.xs_id
+                # print xs.iefa.type, xs.iefa.iefa_list
+                print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
+                print xs.bank_sta.right, xs.bank_sta.left
 
-    # for x in geo_list:
-    #     if isinstance(x, CrossSection):
-    #         print x.xs_id, x.l_bank_sta, x.r_bank_sta
-    #         for i in range(0, len(x.mannings_n)-1):
-    #             if x.mannings_n[i][1] == x.mannings_n[i+1][1]:
-    #                 is_double = False
-    #                 try:
-    #                     if x.mannings_n[i+1][0] == x.mannings_n[i+2][0]:
-    #                         is_double = True
-    #                 except IndexError:
-    #                     is_double = False
-    #                 if not is_double:
-    #                     print 'On XS', x.xs_id, 'Redundant n-value', x.mannings_n[i+1][1], \
-    #                         'at sta ', x.mannings_n[i+1][0]
-    #                 else:
-    #                     print 'WEIRD - On XS', x.xs_id, 'Redundant n-value', x.mannings_n[i+1][1], \
-    #                         'at sta ', x.mannings_n[i+1][0]
+            #print xs.mannings_n
+            # print xs.num_blocked
+            # print xs.blocked_type
+            # print xs.blocked
+            # print xs.num_sta_elev_pts
+            # print len(xs.sta_elev_pts)
+            # print xs.sta_elev_pts
+            # print xs.num_iefa
+            # print xs.iefa_type
+            # print xs.iefa
+    print len(xs_list)
+    # print iefa_count, 'cross sections with iefa'
+
     export_ras_geo(outfile, geo_list)
 
     import filecmp
+    import subprocess
     if filecmp.cmp(infile, outfile, shallow=False):
         print 'Input and output files are identical'
     else:
         print 'WARNING: files are different!!!'
+        subprocess.Popen(["diff", infile, outfile])
 
 if __name__ == '__main__':
     main()

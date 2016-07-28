@@ -13,6 +13,8 @@ def main():
     print test_files
 
     for test_file in test_files:
+        print '*' * 100,
+        print 'Processing ', test_file
         geo_list = prg.import_ras_geo(test_file)
         prg.export_ras_geo(outfile, geo_list)
 
