@@ -28,6 +28,21 @@ class RiverReach(object):
         self.text_location = None  # tuple of location (x, y)
         self.reverse_text = None  # Boolean
 
+    def import_geo(self, line, geo_file):
+        assert self.test(line)
+        values = line[12:].split(',')
+        self.river_name = values[0]
+        self.reach_name = values[1][:-1]
+
+        # Store extra lines
+        line = next(geo_file)
+        self.temp_lines3 = ''
+        while line != '\n':
+            self.temp_lines3 += line
+            line = next(geo_file)
+        self.temp_lines3 += '\n'
+        # return line
+
     @staticmethod
     def test(line):
         """
@@ -40,18 +55,24 @@ class RiverReach(object):
         else:
             return False
 
-    # TODO: remove this line once RiverReach is fully implemented
-    @staticmethod
-    def get_river_reach(line):
-        """
-        returns name of river and reach from first line of river/reach block.
-        :param line: string
-        :return: river, reach - strings
-        """
-        fields = line.split('=')[1].split(',')
-        river = fields[0].strip()
-        reach = fields[1].strip()
-        return river, reach
+    # # TODO: remove this line once RiverReach is fully implemented
+    # @staticmethod
+    # def get_river_reach(line):
+    #     """
+    #     returns name of river and reach from first line of river/reach block.
+    #     :param line: string
+    #     :return: river, reach - strings
+    #     """
+    #     fields = line.split('=')[1].split(',')
+    #     river = fields[0].strip()
+    #     reach = fields[1].strip()
+    #     return river, reach
+
+    def __str__(self):
+        s = 'River Reach=' + self.river_name + ',' + self.reach_name + '\n'
+        for line in self.temp_lines3:
+            s += line
+        return s
 
 
 class OldCrossSection(object):
@@ -353,11 +374,12 @@ class OldCrossSection(object):
 
         return s
 
-
+# test test 
 def import_ras_geo(geo_filename):
     # add  test for file existence
     geo_list = []
     num_xs = 0
+    num_river = 0
     num_unknown = 0
     river = None
     reach = None
@@ -365,10 +387,12 @@ def import_ras_geo(geo_filename):
     with open(geo_filename, 'rt') as geo_file:
         for line in geo_file:
             if RiverReach.test(line):
-                river, reach = RiverReach.get_river_reach(line)
-                #print river, reach
-                geo_list.append(line)
-                num_unknown += 1
+                rr = RiverReach()
+                rr.import_geo(line, geo_file)
+                river, reach = rr.river_name, rr.reach_name
+                # print river, reach
+                num_river += 1
+                geo_list.append(rr)
             elif _xs_test(line):
                 xs = CrossSection(river, reach)
                 xs.import_geo(line, geo_file)
