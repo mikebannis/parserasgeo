@@ -4,3 +4,7 @@
 .idea/workspace.xml
 geos
 geos/*.*
+geos-old
+geos-old/*.*
+test/prg_test.g00
+
