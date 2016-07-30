@@ -92,7 +92,7 @@ def import_ras_geo(geo_filename):
                 # print river, reach
                 num_river += 1
                 geo_list.append(rr)
-            elif _xs_test(line):
+            elif CrossSection.test(line):
                 xs = CrossSection(river, reach)
                 xs.import_geo(line, geo_file)
                 num_xs += 1
