@@ -1,18 +1,3 @@
-def _xs_test(test_line):
-    if test_line[0:23] == 'Type RM Length L Ch R =':
-        if test_line[24:25] == '1':
-            return True
-    return False
-
-
-def _split_by_8(line):
-    return _split_by_n(line, 8)
-
-
-def _split_by_16(line):
-    return _split_by_n(line, 16)
-
-
 def split_by_n(line, n):
     """
 
@@ -49,6 +34,7 @@ def split_by_n_str(line, n):
     return values
 
 
+# TODO - combine with split_by_n()
 def split_block_obs(line, n):
     """
     Is aware of blank blocks and will return '' in addition to a float or int. Also used for iefa.

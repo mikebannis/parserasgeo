@@ -33,7 +33,7 @@ class Header(object):
 
     @staticmethod
     def test(line):
-        if line[0:23] == 'Type RM Length L Ch R =':
+        if line[:23] == 'Type RM Length L Ch R =':
             if line[24:25] == '1':
                 return True
         return False
@@ -62,7 +62,7 @@ class Header(object):
 class CutLine(object):
     def __init__(self):
         self.number_pts = None
-        self.points = []
+        self.points = []  # [(x1,y1),(x2,y2),(x3,y3),...] Values are currently stored as strings
 
     @staticmethod
     def test(line):
@@ -101,7 +101,7 @@ class LastEdit(object):
 class StationElevation(object):
     def __init__(self):
         self.num_pts = None
-        self.points = []
+        self.points = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
 
     @staticmethod
     def test(line):
@@ -330,5 +330,6 @@ class CrossSection(object):
             s += str(line)
         return s + '\n'
 
-    def test(self, line):
-        return self.header.test(line)
+    @staticmethod
+    def test(line):
+        return Header.test(line)
