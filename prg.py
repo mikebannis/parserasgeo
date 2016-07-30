@@ -131,10 +131,10 @@ class OldCrossSection(object):
         # assert self.gis_cut_line != []
 
         # store unused lines - Node Last Edited & sta-elev points
-        self.temp_lines = ''
-        while line[:9] != '#Sta/Elev':
-            self.temp_lines += line
-            line = next(geo_file)
+        # self.temp_lines = ''
+        # while line[:9] != '#Sta/Elev':
+        #     self.temp_lines += line
+        #     line = next(geo_file)
 
         # --- Store sta/elev points
         line = self._import_sta_elev(line, geo_file)
@@ -261,23 +261,23 @@ class OldCrossSection(object):
         assert test_length == len(self.mannings_n)
         return line
 
-    def _import_sta_elev(self, line, geo_file):
-        """
-        Import XS station/elevation points.
-        :param line: current line of geo_file
-        :param geo_file: geometry file object
-        :return: line in geo_file after sta/elev data
-        """
-        # #Sta/Elev= 142
-        self.num_sta_elev_pts = int(line[10:])
-        line = next(geo_file)
-        while line[:6] != '#Mann=':
-            vals = _split_by_n(line, 8)
-            for i in range(0, len(vals), 2):
-                self.sta_elev_pts.append((vals[i], vals[i + 1]))
-            line = next(geo_file)
-        assert len(self.sta_elev_pts) == self.num_sta_elev_pts
-        return line
+    # def _import_sta_elev(self, line, geo_file):
+    #     """
+    #     Import XS station/elevation points.
+    #     :param line: current line of geo_file
+    #     :param geo_file: geometry file object
+    #     :return: line in geo_file after sta/elev data
+    #     """
+    #     # #Sta/Elev= 142
+    #     self.num_sta_elev_pts = int(line[10:])
+    #     line = next(geo_file)
+    #     while line[:6] != '#Mann=':
+    #         vals = _split_by_n(line, 8)
+    #         for i in range(0, len(vals), 2):
+    #             self.sta_elev_pts.append((vals[i], vals[i + 1]))
+    #         line = next(geo_file)
+    #     assert len(self.sta_elev_pts) == self.num_sta_elev_pts
+    #     return line
 
     def __str__(self):
         # Header
@@ -304,12 +304,12 @@ class OldCrossSection(object):
             s += line
 
         # --- Sta/elevation points
-        s += '#Sta/Elev= ' + str(self.num_sta_elev_pts) + ' \n'
-        # unpack tuples
-        sta_elev_list = [x for tup in self.sta_elev_pts for x in tup]
-        # convert to padded columns of 8 
-        temp_str = _print_list_by_group(sta_elev_list, 8, 10)
-        s += temp_str
+        # s += '#Sta/Elev= ' + str(self.num_sta_elev_pts) + ' \n'
+        # # unpack tuples
+        # sta_elev_list = [x for tup in self.sta_elev_pts for x in tup]
+        # # convert to padded columns of 8
+        # temp_str = _print_list_by_group(sta_elev_list, 8, 10)
+        # s += temp_str
 
         # --- Manning's n header
         s += '#Mann= ' + str(len(self.mannings_n)) + ' ,{:>2} , 0 \n'.format(self.horizontal_mann)
@@ -589,12 +589,15 @@ def main():
     if True:
         iefa_count = 0
         for xs in xs_list:
-            if xs.obstruct.blocked_type is not None:
-                iefa_count +=1
-                print '\nXS ID:', xs.header.xs_id
-                # print xs.iefa.type, xs.iefa.iefa_list
-                print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
-                print xs.bank_sta.right, xs.bank_sta.left
+            print '\nXS ID:', xs.header.xs_id
+            print 'number sta_elv=', xs.sta_elev.num_pts
+            print xs.sta_elev.points
+            # if xs.obstruct.blocked_type is not None:
+            #     iefa_count +=1
+            #     print '\nXS ID:', xs.header.xs_id
+            #     # print xs.iefa.type, xs.iefa.iefa_list
+            #     print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
+            #     print xs.bank_sta.right, xs.bank_sta.left
 
             #print xs.mannings_n
             # print xs.num_blocked

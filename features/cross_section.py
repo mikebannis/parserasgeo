@@ -1,7 +1,10 @@
-from tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs
+from tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 
 
 class Feature(object):
+    """
+    This is a template for other features.
+    """
     def __init__(self):
         pass
 
@@ -96,10 +99,45 @@ class LastEdit(object):
 
 
 class StationElevation(object):
-    pass
+    def __init__(self):
+        self.num_pts = None
+        self.points = []
+
+    @staticmethod
+    def test(line):
+        if line[:9] == '#Sta/Elev':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        """
+        Import XS station/elevation points.
+        :param line: current line of geo_file
+        :param geo_file: geometry file object
+        :return: line in geo_file after sta/elev data
+        """
+        self.num_pts = int(line[10:])
+        line = next(geo_file)
+        while line[:1] == ' ' or line[:1].isdigit():
+            vals = split_by_n(line, 8)
+            for i in range(0, len(vals), 2):
+                self.points.append((vals[i], vals[i + 1]))
+            line = next(geo_file)
+        assert len(self.points) == self.num_pts
+        return line
+
+    def __str__(self):
+        s = '#Sta/Elev= ' + str(self.num_pts) + ' \n'
+        # unpack tuples
+        sta_elev_list = [x for tup in self.points for x in tup]
+        # convert to padded columns of 8
+        temp_str = print_list_by_group(sta_elev_list, 8, 10)
+        s += temp_str
+        return s
 
 
 class IEFA(object):
+    # TODO: Add permanence handling
     def __init__(self):
         self.num_iefa = None
         self.type = None
@@ -220,10 +258,11 @@ class CrossSection(object):
         # Load all cross sections parts
         self.cutline = CutLine()
         self.header = Header()
+        self.sta_elev = StationElevation()
         self.iefa = IEFA()
         self.obstruct = Obstruction()
         self.bank_sta = BankStation()
-        self.parts = [self.header, self.cutline, self.iefa, self.obstruct, self.bank_sta]
+        self.parts = [self.header, self.cutline, self.iefa, self.obstruct, self.bank_sta, self.sta_elev]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 

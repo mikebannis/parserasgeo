@@ -13,7 +13,7 @@ def _split_by_16(line):
     return _split_by_n(line, 16)
 
 
-def _split_by_n(line, n):
+def split_by_n(line, n):
     """
 
     :param line:
