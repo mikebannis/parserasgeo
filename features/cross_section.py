@@ -209,6 +209,48 @@ class Obstruction(object):
         return s
 
 
+class Mannings_n(object):
+    def __init__(self):
+        self.values = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
+        self.horizontal = None  # 0 or -1
+
+    @staticmethod
+    def test(line):
+        if line[:6] == '#Mann=':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        # Parse manning's n header line
+        fields = line[6:].split(',')
+        assert len(fields) == 3
+        values = [fl_int(x) for x in fields]
+        test_length = values[0]
+        self.horizontal = values[1]
+
+        # Parse stations and n-values
+        line = next(geo_file)
+
+        # Make sure we're still reading n-values
+        while line[:1] == ' ' or line[:1].isdigit():
+            values = split_by_n(line, 8)
+            assert len(values) % 3 == 0
+            for i in range(0, len(values), 3):
+                self.values.append((values[i], values[i + 1], values[i + 2]))
+            line = next(geo_file)
+        assert test_length == len(self.values)
+        return line
+
+    def __str__(self):
+        s = '#Mann= ' + str(len(self.values)) + ' ,{:>2} , 0 \n'.format(self.horizontal)
+        # n-values - unpack tuples
+        n_list = [x for tup in self.values for x in tup]
+        # convert to padded columns of 8
+        temp_str = print_list_by_group(n_list, 8, 9)
+        s += temp_str
+        return s
+
+
 class BankStation(object):
     def __init__(self):
         self.left = None
@@ -260,9 +302,11 @@ class CrossSection(object):
         self.header = Header()
         self.sta_elev = StationElevation()
         self.iefa = IEFA()
+        self.mannings_n = Mannings_n()
         self.obstruct = Obstruction()
         self.bank_sta = BankStation()
-        self.parts = [self.header, self.cutline, self.iefa, self.obstruct, self.bank_sta, self.sta_elev]
+        self.parts = [self.header, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
+                      self.sta_elev]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 

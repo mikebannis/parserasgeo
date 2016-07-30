@@ -66,9 +66,9 @@ class OldCrossSection(object):
         self.channel_length = None
         self.rob_length = None
 
-        # self.last_edit = ''
-        self.horizontal_mann = True
-        self.mannings_n = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
+        # # self.last_edit = ''
+        # self.horizontal_mann = True
+        # self.mannings_n = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
 
         # ------ GIS cut lines
         self.num_cutline_pts = None
@@ -111,12 +111,12 @@ class OldCrossSection(object):
         # self.rob_length = vals[4]
 
         # --- Description
-        # TODO - make this store the description in a variable
-        self.temp_lines0 = ''
-        line = next(geo_file)
-        while line[:15] != 'XS GIS Cut Line':
-            self.temp_lines0 += line
-            line = next(geo_file)
+        # # TODO - make this store the description in a variable
+        # self.temp_lines0 = ''
+        # line = next(geo_file)
+        # while line[:15] != 'XS GIS Cut Line':
+        #     self.temp_lines0 += line
+        #     line = next(geo_file)
 
         # ---- GIS Cut line
         # vals = line.split('=')
@@ -240,26 +240,26 @@ class OldCrossSection(object):
         assert self.num_iefa == len(self.iefa)
         return line
 
-    def _import_manning_n(self, line, geo_file):
-        # Parse manning's n header line
-        fields = line[6:].split(',')
-        assert len(fields) == 3
-        values = [_fl_int(x) for x in fields]
-        test_length = values[0]
-        self.horizontal_mann = values[1]
-
-        # Parse stations and n-values
-        line = next(geo_file)
-
-        # Make sure we're still reading n-values
-        while line[:1] == ' ' or line[:1].isdigit():
-            values = _split_by_8(line)
-            assert len(values) % 3 == 0
-            for i in range(0, len(values), 3):
-                self.mannings_n.append((values[i], values[i+1], values[i+2]))
-            line = next(geo_file)
-        assert test_length == len(self.mannings_n)
-        return line
+    # def _import_manning_n(self, line, geo_file):
+    #     # Parse manning's n header line
+    #     fields = line[6:].split(',')
+    #     assert len(fields) == 3
+    #     values = [_fl_int(x) for x in fields]
+    #     test_length = values[0]
+    #     self.horizontal_mann = values[1]
+    #
+    #     # Parse stations and n-values
+    #     line = next(geo_file)
+    #
+    #     # Make sure we're still reading n-values
+    #     while line[:1] == ' ' or line[:1].isdigit():
+    #         values = _split_by_8(line)
+    #         assert len(values) % 3 == 0
+    #         for i in range(0, len(values), 3):
+    #             self.mannings_n.append((values[i], values[i+1], values[i+2]))
+    #         line = next(geo_file)
+    #     assert test_length == len(self.mannings_n)
+    #     return line
 
     # def _import_sta_elev(self, line, geo_file):
     #     """
@@ -312,12 +312,12 @@ class OldCrossSection(object):
         # s += temp_str
 
         # --- Manning's n header
-        s += '#Mann= ' + str(len(self.mannings_n)) + ' ,{:>2} , 0 \n'.format(self.horizontal_mann)
-        # n-values - unpack tuples
-        n_list = [x for tup in self.mannings_n for x in tup]
-        # convert to padded columns of 8
-        temp_str = _print_list_by_group(n_list, 8, 9)
-        s += temp_str
+        # s += '#Mann= ' + str(len(self.mannings_n)) + ' ,{:>2} , 0 \n'.format(self.horizontal_mann)
+        # # n-values - unpack tuples
+        # n_list = [x for tup in self.mannings_n for x in tup]
+        # # convert to padded columns of 8
+        # temp_str = _print_list_by_group(n_list, 8, 9)
+        # s += temp_str
 
         # temp_lines1
         for line in self.temp_lines1:
@@ -590,8 +590,10 @@ def main():
         iefa_count = 0
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
-            print 'number sta_elv=', xs.sta_elev.num_pts
-            print xs.sta_elev.points
+            print xs.mannings_n.horizontal, xs.mannings_n.values
+            # print 'number sta_elv=', xs.sta_elev.num_pts
+            # print xs.sta_elev.points
+            # print xs.cutline.number_pts, xs.cutline.points
             # if xs.obstruct.blocked_type is not None:
             #     iefa_count +=1
             #     print '\nXS ID:', xs.header.xs_id
