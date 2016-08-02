@@ -8,7 +8,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
-from features import CrossSection
+from features import CrossSection, RiverReach
 
 # TODO - create geolist object
 
@@ -16,63 +16,6 @@ from features import CrossSection
 class CrossSectionNotFound(Exception):
     pass
 
-
-class RiverReach(object):
-    """
-    Holds data for River Reach (name, georef'd line)
-    """
-    def __init__(self):
-        self.river_name = None
-        self.reach_name = None
-        self.geo = []  # list of tuples (x, y)
-        self.text_location = None  # tuple of location (x, y)
-        self.reverse_text = None  # Boolean
-
-    def import_geo(self, line, geo_file):
-        assert self.test(line)
-        values = line[12:].split(',')
-        self.river_name = values[0]
-        self.reach_name = values[1][:-1]
-
-        # Store extra lines
-        line = next(geo_file)
-        self.temp_lines3 = ''
-        while line != '\n':
-            self.temp_lines3 += line
-            line = next(geo_file)
-        self.temp_lines3 += '\n'
-        # return line
-
-    @staticmethod
-    def test(line):
-        """
-        Tests "line" to see if it is the first line of a river/reach block
-        :param line: string
-        :return boolean - true if first line of river/reach, otherwise false
-        """
-        if line[:12] == 'River Reach=':
-            return True
-        else:
-            return False
-
-    # # TODO: remove this line once RiverReach is fully implemented
-    # @staticmethod
-    # def get_river_reach(line):
-    #     """
-    #     returns name of river and reach from first line of river/reach block.
-    #     :param line: string
-    #     :return: river, reach - strings
-    #     """
-    #     fields = line.split('=')[1].split(',')
-    #     river = fields[0].strip()
-    #     reach = fields[1].strip()
-    #     return river, reach
-
-    def __str__(self):
-        s = 'River Reach=' + self.river_name + ',' + self.reach_name + '\n'
-        for line in self.temp_lines3:
-            s += line
-        return s
 
 def import_ras_geo(geo_filename):
     # add  test for file existence
@@ -88,7 +31,7 @@ def import_ras_geo(geo_filename):
             if RiverReach.test(line):
                 rr = RiverReach()
                 rr.import_geo(line, geo_file)
-                river, reach = rr.river_name, rr.reach_name
+                river, reach = rr.header.river_name, rr.header.reach_name
                 # print river, reach
                 num_river += 1
                 geo_list.append(rr)
@@ -180,8 +123,16 @@ def main():
 
     geo_list = import_ras_geo(infile)
 
+    for item in geo_list:
+        if type(item) is RiverReach:
+            print item.header.river_name, item.header.reach_name
+            print item.geo.num_points
+            # print item.geo.points
+            print item.text.position
+            print item.text.reverse
+
     xs_list = extract_xs(geo_list)
-    if True:
+    if not True:
         iefa_count = 0
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
@@ -207,8 +158,6 @@ def main():
             # print xs.num_iefa
             # print xs.iefa_type
             # print xs.iefa
-    print len(xs_list)
-    # print iefa_count, 'cross sections with iefa'
 
     export_ras_geo(outfile, geo_list)
 
