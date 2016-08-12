@@ -8,7 +8,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
-from features import CrossSection, RiverReach
+from features import CrossSection, RiverReach, BridgeCulvert
 
 # TODO - create geolist object
 
@@ -17,11 +17,12 @@ class CrossSectionNotFound(Exception):
     pass
 
 
-def import_ras_geo(geo_filename):
+def import_ras_geo(geo_filename, chatty=False):
     # add  test for file existence
     geo_list = []
     num_xs = 0
     num_river = 0
+    num_bc = 0
     num_unknown = 0
     river = None
     reach = None
@@ -40,12 +41,20 @@ def import_ras_geo(geo_filename):
                 xs.import_geo(line, geo_file)
                 num_xs += 1
                 geo_list.append(xs)
+            elif BridgeCulvert.test(line):
+                bc = BridgeCulvert(river, reach)
+                bc.import_geo(line, geo_file)
+                num_bc += 1
+                geo_list.append(bc)
             else:
                 # Unknown line encountered. Store it as text.
                 geo_list.append(line)
                 num_unknown += 1
-    #print str(num_xs)+' cross sections imported'
-    #print str(num_unknown) + ' unknown lines imported'
+    if chatty:      
+        print str(num_river)+' rivers/reaches imported'
+        print str(num_xs)+' cross sections imported'
+        print str(num_bc)+' bridges/culverts imported'
+        print str(num_unknown) + ' unknown lines imported'
     return geo_list
 
 
@@ -121,19 +130,23 @@ def main():
     infile = 'geos/GHC_working.g43'
     outfile = 'test/test.out'
 
-    geo_list = import_ras_geo(infile)
+    geo_list = import_ras_geo(infile, chatty=True)
+    
+    if not True:
+        for item in geo_list:
+            if type(item) is BridgeCulvert:
+                print '-'*50
+                print 'bridge/culvert', item.header.station
+                print str(item)
 
-    for item in geo_list:
-        if type(item) is RiverReach:
-            print item.header.river_name, item.header.reach_name
-            print item.geo.num_points
-            # print item.geo.points
-            print item.text.position
-            print item.text.reverse
+    if True:
+        for item in geo_list:
+            if type(item) is str:
+                print str(item),
 
-    xs_list = extract_xs(geo_list)
     if not True:
         iefa_count = 0
+        xs_list = extract_xs(geo_list)
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
             print xs.mannings_n.horizontal, xs.mannings_n.values
@@ -160,14 +173,15 @@ def main():
             # print xs.iefa
 
     export_ras_geo(outfile, geo_list)
-
-    import filecmp
-    import subprocess
-    if filecmp.cmp(infile, outfile, shallow=False):
-        print 'Input and output files are identical'
-    else:
-        print 'WARNING: files are different!!!'
-        subprocess.Popen(["diff", infile, outfile])
+    
+    if True: 
+        import filecmp
+        import subprocess
+        if filecmp.cmp(infile, outfile, shallow=False):
+            print 'Input and output files are identical'
+        else:
+            print 'WARNING: files are different!!!'
+            subprocess.Popen(["diff", infile, outfile])
 
 if __name__ == '__main__':
     main()
