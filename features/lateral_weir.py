@@ -1,5 +1,5 @@
 from tools import fl_int #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-
+from description import Description
 
 class Feature(object):
     """
@@ -68,12 +68,13 @@ class LateralWeir(object):
         # Load all cross sections parts
 #        self.cutline = CutLine()
         self.header = Header()
+        self.description = Description()
 #        self.sta_elev = StationElevation()
 #        self.iefa = IEFA()
 #        self.mannings_n = Mannings_n()
 #        self.obstruct = Obstruction()
 #        self.bank_sta = BankStation()
-        self.parts = [self.header]
+        self.parts = [self.header, self.description]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 

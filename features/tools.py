@@ -111,3 +111,5 @@ def pad_left(guts, pad_number):
     :return: string
     """
     return ('{:>'+str(pad_number)+'}').format(guts)
+
+

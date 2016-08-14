@@ -148,6 +148,14 @@ def main():
                 print '-'*50
                 print 'bridge/culvert', item.header.station
                 print str(item)
+    
+    if True:
+        for item in geo_list:
+            if hasattr(item, 'description'):
+                if item.description is not []:
+                    print type(item)
+                    print item.description
+
 
     if True:
         count = 0
@@ -163,8 +171,9 @@ def main():
         xs_list = extract_xs(geo_list)
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
-            print xs.mannings_n.horizontal, xs.mannings_n.values
-            print xs.bank_sta.left, xs.bank_sta.right
+            print xs.description.text
+            #print xs.mannings_n.horizontal, xs.mannings_n.values
+            #print xs.bank_sta.left, xs.bank_sta.right
             # print 'number sta_elv=', xs.sta_elev.num_pts
             # print xs.sta_elev.points
             # print xs.cutline.number_pts, xs.cutline.points
@@ -188,7 +197,7 @@ def main():
 
     export_ras_geo(outfile, geo_list)
     
-    if True: 
+    if not True: 
         import filecmp
         import subprocess
         if filecmp.cmp(infile, outfile, shallow=False):
