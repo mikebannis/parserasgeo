@@ -8,7 +8,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
-from features import CrossSection, RiverReach, BridgeCulvert
+from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir
 
 # TODO - create geolist object
 
@@ -41,8 +41,18 @@ def import_ras_geo(geo_filename, chatty=False):
                 xs.import_geo(line, geo_file)
                 num_xs += 1
                 geo_list.append(xs)
-            elif BridgeCulvert.test(line):
-                bc = BridgeCulvert(river, reach)
+            elif Culvert.test(line):
+                bc = Culvert(river, reach)
+                bc.import_geo(line, geo_file)
+                num_bc += 1
+                geo_list.append(bc)
+            elif Bridge.test(line):
+                bc = Bridge(river, reach)
+                bc.import_geo(line, geo_file)
+                num_bc += 1
+                geo_list.append(bc)
+            elif LateralWeir.test(line):
+                bc = LateralWeir(river, reach)
                 bc.import_geo(line, geo_file)
                 num_bc += 1
                 geo_list.append(bc)
@@ -134,15 +144,19 @@ def main():
     
     if not True:
         for item in geo_list:
-            if type(item) is BridgeCulvert:
+            if type(item) is Culvert:
                 print '-'*50
                 print 'bridge/culvert', item.header.station
                 print str(item)
 
     if True:
+        count = 0
         for item in geo_list:
             if type(item) is str:
+                count += 1
                 print str(item),
+        print count, 'unknown lines'
+                    
 
     if not True:
         iefa_count = 0

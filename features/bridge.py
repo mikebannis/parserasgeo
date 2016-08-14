@@ -21,7 +21,7 @@ class Feature(object):
         pass
 
 
-# TODO: possibly move header into BridgeCulvert
+# TODO: possibly move header into Bridge
 class Header(object):
     def __init__(self):
 
@@ -34,7 +34,7 @@ class Header(object):
     @staticmethod
     def test(line):
         if line[:23] == 'Type RM Length L Ch R =':
-            if line[24:25] == '2':
+            if line[24:25] == '3':
                 return True
         return False
 
@@ -294,7 +294,7 @@ class Header(object):
 #        pass
 #
 #
-class BridgeCulvert(object):
+class Bridge(object):
     def __init__(self, river, reach):
         self.river = river
         self.reach = reach
