@@ -166,12 +166,12 @@ def main():
         print count, 'unknown lines'
                     
 
-    if not True:
+    if True:
         iefa_count = 0
         xs_list = extract_xs(geo_list)
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
-            print xs.description.text
+            #print xs.description.text
             #print xs.mannings_n.horizontal, xs.mannings_n.values
             #print xs.bank_sta.left, xs.bank_sta.right
             # print 'number sta_elv=', xs.sta_elev.num_pts
@@ -180,9 +180,11 @@ def main():
             # if xs.obstruct.blocked_type is not None:
             #     iefa_count +=1
             #     print '\nXS ID:', xs.header.xs_id
-            #     # print xs.iefa.type, xs.iefa.iefa_list
-            #     print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
-            #     print xs.bank_sta.right, xs.bank_sta.left
+            if xs.iefa.type is not None:
+                print xs.iefa.type, xs.iefa.iefa_list
+                print xs.iefa.iefa_permanence
+                #print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
+                #print xs.bank_sta.right, xs.bank_sta.left
 
             #print xs.mannings_n
             # print xs.num_blocked
@@ -197,7 +199,7 @@ def main():
 
     export_ras_geo(outfile, geo_list)
     
-    if not True: 
+    if True: 
         import filecmp
         import subprocess
         if filecmp.cmp(infile, outfile, shallow=False):

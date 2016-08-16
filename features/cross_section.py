@@ -138,12 +138,12 @@ class StationElevation(object):
 
 
 class IEFA(object):
-    # TODO: Add permanence handling
     def __init__(self):
         self.num_iefa = None
         self.type = None
         self.iefa_list = []
         self.iefa_permanence = []
+                    
 
     @staticmethod
     def test(line):
@@ -164,6 +164,22 @@ class IEFA(object):
                 self.iefa_list.append((values[i], values[i + 1], values[i + 2]))
             line = next(geo_file)
         assert self.num_iefa == len(self.iefa_list)
+        
+        # Process IEFA permanence
+        if line != 'Permanent Ineff=\n':
+            raise ValueError('Permanent Ineff= does not follow IEFA in geometry file. Aborting.')
+        line = next(geo_file)
+        while line[:1] == ' ':
+            values = line.split()
+            for value in values:
+                if value == 'T':
+                    self.iefa_permanence.append(True)
+                elif value == 'F':
+                    self.iefa_permanence.append(False)
+                else:
+                    raise ValueError(value + ' found in IEFA permanence filed. Should be T or F. Aborting')
+            line = next(geo_file)
+        assert len(self.iefa_list) == len(self.iefa_permanence)
 
         return line
 
@@ -171,6 +187,13 @@ class IEFA(object):
         temp_iefa = [x for tup in self.iefa_list for x in tup]
         s = '#XS Ineff= ' + str(self.num_iefa) + ' ,' + pad_left(self.type, 2) + ' \n'
         s += print_list_by_group(temp_iefa, 8, 9)
+        s += 'Permanent Ineff=\n'
+        for value in self.iefa_permanence:
+            if value:
+                s += '       T'
+            else:
+                s += '       F'
+        s += '\n'            
         return s
 
 
