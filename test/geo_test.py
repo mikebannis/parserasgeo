@@ -8,15 +8,15 @@ import prg
 
 
 def main():
-    outfile = 'prg_test.g00'
+    outfile = 'test.out'
     test_files = glob.glob('../geos/*.g??')
     print test_files
 
     for test_file in test_files:
         print '*' * 100,
         print 'Processing ', test_file
-        geo_list = prg.import_ras_geo(test_file)
-        prg.export_ras_geo(outfile, geo_list)
+        geo = prg.ParseRASGeo(test_file)
+        geo.write(outfile)
 
         if filecmp.cmp(test_file, outfile, shallow=False):
             print 'Geometry file', test_file, 'exported correctly.'
