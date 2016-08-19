@@ -1,3 +1,4 @@
+#! /usr/bin/python 
 import glob
 import sys
 import filecmp
