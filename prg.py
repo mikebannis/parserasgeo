@@ -1,3 +1,4 @@
+#! /usr/bin/python
 """
 rasgeotool - tools for importing, modifying, and exporting HEC-RAS geometry files (myproject.g01 etc)
 
@@ -8,7 +9,7 @@ Mike Bannister 2/24/2016
 Version 0.01
 """
 
-from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir
+from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir, Junction
 
 # TODO - create geolist object
 
@@ -25,6 +26,7 @@ class ParseRASGeo(object):
         num_bridge = 0
         num_culvert = 0
         num_lat_weir = 0
+        num_junc = 0
         num_unknown = 0
         river = None
         reach = None
@@ -57,12 +59,18 @@ class ParseRASGeo(object):
                     lat_weir.import_geo(line, geo_file)
                     num_lat_weir += 1
                     self.geo_list.append(lat_weir)
+                elif Junction.test(line):
+                    junc = Junction()
+                    junc.import_geo(line, geo_file)
+                    num_junc += 1
+                    self.geo_list.append(junc)
                 else:
                     # Unknown line encountered. Store it as text.
                     self.geo_list.append(line)
                     num_unknown += 1
         if chatty:      
             print str(num_river)+' rivers/reaches imported'
+            print str(num_junc)+' junctions imported'
             print str(num_xs)+' cross sections imported'
             print str(num_bridge)+' bridge imported'
             print str(num_culvert)+' culverts imported'
@@ -157,40 +165,22 @@ def main():
         for item in geo.geo_list:
             if type(item) is str:
                 count += 1
-                # print str(item),
+                print 'unknown: ', str(item),
         print count, 'unknown lines'
                     
 
     if not True:
-        iefa_count = 0
         xs_list = geo.extract_xs()
         for xs in xs_list:
             print '\nXS ID:', xs.header.xs_id
-            #print xs.description.text
-            #print xs.mannings_n.horizontal, xs.mannings_n.values
-            #print xs.bank_sta.left, xs.bank_sta.right
-            # print 'number sta_elv=', xs.sta_elev.num_pts
-            # print xs.sta_elev.points
-            # print xs.cutline.number_pts, xs.cutline.points
-            # if xs.obstruct.blocked_type is not None:
-            #     iefa_count +=1
-            #     print '\nXS ID:', xs.header.xs_id
             if xs.iefa.type is not None:
                 print xs.iefa.type, xs.iefa.iefa_list
                 print xs.iefa.iefa_permanence
-                #print xs.obstruct.blocked_type, xs.obstruct.num_blocked, xs.obstruct.blocked
-                #print xs.bank_sta.right, xs.bank_sta.left
-
-            #print xs.mannings_n
-            # print xs.num_blocked
-            # print xs.blocked_type
-            # print xs.blocked
-            # print xs.num_sta_elev_pts
-            # print len(xs.sta_elev_pts)
-            # print xs.sta_elev_pts
-            # print xs.num_iefa
-            # print xs.iefa_type
-            # print xs.iefa
+    
+    if not True:
+        for item in geo.geo_list:
+            if type(item) is Junction:
+                print 'Junction', item.header.name
 
     geo.write(outfile)
     
