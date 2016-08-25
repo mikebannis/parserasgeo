@@ -76,7 +76,7 @@ class CutLine(object):
         assert vals[0] == 'XS GIS Cut Line' and len(vals) == 2
         self.number_pts = int(vals[1])
         line = next(geo_file)
-        while line[:1] == ' ' or line[:1].isdigit():
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             vals = split_by_n_str(line, 16)
             for i in range(0, len(vals), 2):
                 self.points.append((vals[i], vals[i + 1]))
@@ -119,7 +119,7 @@ class StationElevation(object):
         """
         self.num_pts = int(line[10:])
         line = next(geo_file)
-        while line[:1] == ' ' or line[:1].isdigit():
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             vals = split_by_n(line, 8)
             for i in range(0, len(vals), 2):
                 self.points.append((vals[i], vals[i + 1]))
@@ -157,7 +157,7 @@ class IEFA(object):
         self.type = int(values[1])
         line = next(geo_file)
         # Due to possible blank lines in geometry file, all data must be treated as a string
-        while line[:1] == ' ' or line[:1].isdigit():
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             values = split_block_obs(line, 8)
             assert len(values) % 3 == 0
             for i in range(0, len(values), 3):
@@ -216,7 +216,7 @@ class Obstruction(object):
 
         line = next(geo_file)
         # Due to possible missing elevation all values must be treated as strings
-        while line[:1] == ' ' or line[:1].isdigit():
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             values = split_block_obs(line, 8)
             assert len(values) % 3 == 0
             for i in range(0, len(values), 3):
@@ -256,7 +256,7 @@ class Mannings_n(object):
         line = next(geo_file)
 
         # Make sure we're still reading n-values
-        while line[:1] == ' ' or line[:1].isdigit():
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             values = split_by_n(line, 8)
             assert len(values) % 3 == 0
             for i in range(0, len(values), 3):
