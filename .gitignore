@@ -7,4 +7,5 @@ geos/*.*
 geos-old
 geos-old/*.*
 test/prg_test.g00
-
+*.egg-info
+*.egg-info/*
