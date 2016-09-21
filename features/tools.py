@@ -59,7 +59,7 @@ def split_block_obs(line, n):
 
 
 def fl_int(value):
-    """ Converts string to either float or int depending on precense of decimal point.
+    """ Converts string to either float or int depending on presence of decimal point.
     The RAS geo file does not have a decimal place if it is not needed. weird.
     :param value: string to convert
     :return: returns int or float
@@ -93,7 +93,8 @@ def print_list_by_group(values, width, num_columns):
 
             # Strip leading 0 from 0.12345 - with or without spaces or '-'
             if temp[:2] == '0.':
-                temp = temp[1:]
+                #temp = temp[1:]
+                temp = ' ' + temp[1:]
             temp = temp.replace(' 0.', '  .')
             temp = temp.replace('-0.', ' -.')
 

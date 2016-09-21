@@ -142,6 +142,8 @@ def main():
     #infile = 'test/CCRC_prg_test.g01'
     infile = 'geos/SBK_PMR.g02'
     infile = 'geos/GHC_working.g43'
+    infile = 'geos/SPR_Downstream.g04'
+    infile = 'geos/SPR_Upstream.g02'
     outfile = 'test/test.out'
 
     geo = ParseRASGeo(infile, chatty=True)
@@ -168,15 +170,12 @@ def main():
                 print 'unknown: ', str(item),
         print count, 'unknown lines'
                     
-
-    if not True:
+    if True:
         xs_list = geo.extract_xs()
         for xs in xs_list:
-            print '\nXS ID:', xs.header.xs_id
-            if xs.iefa.type is not None:
-                print xs.iefa.type, xs.iefa.iefa_list
-                print xs.iefa.iefa_permanence
-    
+            if xs.skew.angle is not None:
+                print str(xs.header.xs_id)+','+str(xs.skew.angle)
+
     if not True:
         for item in geo.geo_list:
             if type(item) is Junction:

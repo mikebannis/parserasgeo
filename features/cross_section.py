@@ -22,6 +22,27 @@ class Feature(object):
         pass
 
 
+class Skew(object):
+    """
+    Cross section skew angle
+    """
+    def __init__(self):
+        self.angle = None
+
+    @staticmethod
+    def test(line):
+        if line.split('=')[0] == 'Skew Angle':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        self.angle = float(line.split('=')[1])
+        return next(geo_file)
+
+    def __str__(self):
+        return 'Skew Angle= '+str(fl_int(self.angle))+' \n'
+
+
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
@@ -144,7 +165,6 @@ class IEFA(object):
         self.iefa_list = []
         self.iefa_permanence = []
                     
-
     @staticmethod
     def test(line):
         if line[:10] == '#XS Ineff=':
@@ -330,8 +350,9 @@ class CrossSection(object):
         self.mannings_n = Mannings_n()
         self.obstruct = Obstruction()
         self.bank_sta = BankStation()
+        self.skew = Skew()
         self.parts = [self.header, self.description, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
-                      self.sta_elev]
+                      self.sta_elev, self.skew]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 
