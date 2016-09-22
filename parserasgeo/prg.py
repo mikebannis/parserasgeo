@@ -89,11 +89,27 @@ class ParseRASGeo(object):
                     return item
         raise CrossSectionNotFound
 
-    def return_xs(self, xs_id, river, reach):
-        for item in self.geo_list:
-            if isinstance(item, CrossSection):
-                if item.header.xs_id == xs_id and item.river == river and item.reach == reach:
-                    return item
+    def return_xs(self, xs_id, river, reach, strip=False):
+        """
+        returns matching CrossSection if it is in self.geo_list. raises CrossSectionNotFound otherwise
+        :param xs_id: cross section id number
+        :param river: name of river
+        :param reach: name of reach
+        :param strip: strips whitespace off river and reach if true
+        :return: CrossSection object
+        """
+        if strip:
+            river = river.strip()
+            reach = reach.strip()
+            for item in self.geo_list:
+                if isinstance(item, CrossSection):
+                    if item.header.xs_id == xs_id and item.river.strip() == river and item.reach.strip() == reach:
+                        return item
+        else:
+            for item in self.geo_list:
+                if isinstance(item, CrossSection):
+                    if item.header.xs_id == xs_id and item.river == river and item.reach == reach:
+                        return item
         raise CrossSectionNotFound
 
     def extract_xs(self):

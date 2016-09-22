@@ -294,6 +294,45 @@ class Mannings_n(object):
         s += temp_str
         return s
 
+    def check_for_duplicate_n_values(self):
+        """
+        Checks cross section for two n-value changes at the same station. This does happen, I'm not sure how, and
+        HEC-RAS is okay with it. Raises ValueError if self.mannings_n is empty
+        :return: Returns a list of station with multiple n-value changes if they exist, otherwise returns None
+        """
+        n_values = list(self.values)
+        if n_values == []:
+            raise ValueError('Cross section has no Manning\'s n values.')
+        errors = []
+        last_station = n_values.pop(0)[0]
+        for n_value in n_values:
+            if n_value[0] == last_station:
+                errors.append(last_station)
+            last_station = n_value[0]
+        if errors != []:
+            return errors
+        else:
+            return None
+
+    def check_for_redundant_n_values(self):
+        """
+        Checks for redundant n-value changes, e.g. 0.035 then 0.035. Raises ValueError if self.mannings_n is empty
+        :return: Returns a list of station with redundant n-value changes if they exist, otherwise returns None
+        """
+        n_values = list(self.values)
+        if n_values == []:
+            raise ValueError('Cross section has no Manning\'s n values.')
+        errors = []
+        last_n_value = n_values.pop(0)[1]
+        for n_value in n_values:
+            if n_value[1] == last_n_value:
+                errors.append(n_value[0])
+            last_n_value = n_value[1]
+        if errors != []:
+            return errors
+        else:
+            return None
+
 
 class BankStation(object):
     def __init__(self):
@@ -380,41 +419,3 @@ class CrossSection(object):
     def test(line):
         return Header.test(line)
 
-    def check_for_duplicate_n_values(self):
-        """
-        Checks cross section for two n-value changes at the same station. This does happen, I'm not sure how, and
-        HEC-RAS is okay with it. Raises ValueError if self.mannings_n is empty
-        :return: Returns a list of station with multiple n-value changes if they exist, otherwise returns None
-        """
-        n_values = list(self.mannings_n.values)
-        if n_values == []:
-            raise ValueError('Cross section ' + self.header.xs_id + ' has no Manning\'s n values.')
-        errors = []
-        last_station = n_values.pop(0)[0]
-        for n_value in n_values:
-            if n_value[0] == last_station:
-                errors.append(last_station)
-            last_station = n_value[0]
-        if errors != []:
-            return errors
-        else:
-            return None
-
-    def check_for_redundant_n_values(self):
-        """
-        Checks for redundant n-value changes, e.g. 0.035 then 0.035. Raises ValueError if self.mannings_n is empty
-        :return: Returns a list of station with redundant n-value changes if they exist, otherwise returns None
-        """
-        n_values = list(self.mannings_n.values)
-        if n_values == []:
-            raise ValueError('Cross section ' + self.header.xs_id + ' has no Manning\'s n values.')
-        errors = []
-        last_n_value = n_values.pop(0)[1]
-        for n_value in n_values:
-            if n_value[1] == last_n_value:
-                errors.append(n_value[0])
-            last_n_value = n_value[1]
-        if errors != []:
-            return errors
-        else:
-            return None
