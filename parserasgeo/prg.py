@@ -138,13 +138,13 @@ class ParseRASGeo(object):
 
 def main():
     infile = 'geos/201601BigDryCreek.g27'
-    #infile = 'geos/GHC_FHAD.g01'
+    #infile = '../geos/GHC_FHAD.g01'
     #infile = 'test/CCRC_prg_test.g01'
     infile = 'geos/SBK_PMR.g02'
     infile = 'geos/GHC_working.g43'
     infile = 'geos/SPR_Downstream.g04'
-    infile = 'geos/SPR_Upstream.g02'
-    outfile = 'test/test.out'
+    infile = '../geos/SPR_Upstream.g02'
+    outfile = '../test/test.out'
 
     geo = ParseRASGeo(infile, chatty=True)
     
