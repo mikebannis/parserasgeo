@@ -317,7 +317,7 @@ class BankStation(object):
     def __str__(self):
         return 'Bank Sta=' + str(self.left) + ',' + str(self.right) + '\n'
 
-
+# TODO: implement contraction/expansion
 class ExpansionContraction(object):
     def __init__(self):
         self.exp_coeff = None
