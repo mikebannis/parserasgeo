@@ -85,14 +85,14 @@ class ParseRASGeo(object):
     def return_xs_by_id(self, xs_id):
         for item in self.geo_list:
             if isinstance(item, CrossSection):
-                if item.xs_id == xs_id:
+                if item.header.xs_id == xs_id:
                     return item
         raise CrossSectionNotFound
 
     def return_xs(self, xs_id, river, reach):
         for item in self.geo_list:
             if isinstance(item, CrossSection):
-                if item.xs_id == xs_id and item.river == river and item.reach == reach:
+                if item.header.xs_id == xs_id and item.river == river and item.reach == reach:
                     return item
         raise CrossSectionNotFound
 
@@ -113,7 +113,7 @@ class ParseRASGeo(object):
         :param geo_list: list from import_ras_geo
         :return: number (int) of XS in geolist
         """
-        xs_list = extract_xs(self.geo_list)
+        xs_list = self.extract_xs()
         return len(xs_list)
 
     def is_xs_duplicate(self, xs_id):
