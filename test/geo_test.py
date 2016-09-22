@@ -5,7 +5,7 @@ import filecmp
 import subprocess
 sys.path.insert(0, '..')
 
-import prg
+import parserasgeo as prg
 
 
 def main():
