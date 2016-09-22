@@ -7,5 +7,10 @@ geos/*.*
 geos-old
 geos-old/*.*
 test/prg_test.g00
+<<<<<<< HEAD
 *.pyc
 
+=======
+*.egg-info
+*.egg-info/*
+>>>>>>> 89d85b6d7d4351b5447414b9d1176ba2849fb04a
