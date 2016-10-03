@@ -381,6 +381,7 @@ class CrossSection(object):
         self.reach = reach
 
         # Load all cross sections parts
+        # TODO: Add "Node Name=" tag, see harvard gulch/dry gulch for example
         self.cutline = CutLine()
         self.header = Header()
         self.description = Description()
