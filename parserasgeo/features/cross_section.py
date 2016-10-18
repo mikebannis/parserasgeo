@@ -22,6 +22,27 @@ class Feature(object):
         pass
 
 
+class Levee(object):
+    """
+    Levees. This is poorly implemented and only grabs the line past the "=" as a string
+    """
+    def __init__(self):
+        self.value = None
+
+    @staticmethod
+    def test(line):
+        if line.split('=')[0] == 'Levee':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        self.value = line.split('=')[1]
+        return next(geo_file)
+
+    def __str__(self):
+        return 'Levee=' + self.value + '\n'
+
+
 class Skew(object):
     """
     Cross section skew angle
@@ -405,8 +426,9 @@ class CrossSection(object):
         self.obstruct = Obstruction()
         self.bank_sta = BankStation()
         self.skew = Skew()
+        self.levee = Levee()
         self.parts = [self.header, self.description, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
-                      self.sta_elev, self.skew]
+                      self.sta_elev, self.skew, self.levee]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 
