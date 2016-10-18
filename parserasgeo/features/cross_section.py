@@ -131,6 +131,20 @@ class StationElevation(object):
             return True
         return False
 
+    def elevation(self, sta):
+        """
+        Returns elevation of point at station 'station'
+        Raises AttributeError if station is not foudn
+        :param sta: float, station of interest
+        :return: double, elevation
+        """
+        # TODO - implement more efficient search
+        for pt in self.points:
+            if pt[0] == sta:
+                return pt[1]
+        raise AttributeError('No station matching ' + str(sta) + ' in current XS.')
+        
+
     def import_geo(self, line, geo_file):
         """
         Import XS station/elevation points.

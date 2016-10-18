@@ -3,6 +3,7 @@ import parserasgeo as prg
 def main():
     infile = r"Z:\UDFCD PLANNING\FHAD Review\Niver Round 3\Orig\20161012 FHAD Submittal\HEC-RAS\NiverCreek_FHAD_Sept.g01"
     #infile = r"Z:\UDFCD PLANNING\Grange Hall Creek\02 HYDRAULICS\HEC-RAS\GHC_FHAD.g01"
+    infile = r"Z:\UDFCD PLANNING\FHAD Review\Sloans Lake Round 1\Orig\20161013 - Sloan'sLake_FHAD_HEC-RAS-20161007\HEC-RAS\SloansFHAD2017.g01"
 
     geo = prg.ParseRASGeo(infile)
     cross_sections = geo.extract_xs()
