@@ -11,3 +11,4 @@ test/prg_test.g00
 *.pyc
 *.egg-info
 *.egg-info/*
+test.out

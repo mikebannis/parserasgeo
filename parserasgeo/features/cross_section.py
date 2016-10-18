@@ -40,7 +40,7 @@ class Levee(object):
         return next(geo_file)
 
     def __str__(self):
-        return 'Levee=' + self.value + '\n'
+        return 'Levee=' + self.value  # + '\n' - not needed since it's just a dumb string (with the \n)
 
 
 class Skew(object):
