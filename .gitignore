@@ -11,4 +11,5 @@ test/prg_test.g00
 *.pyc
 *.egg-info
 *.egg-info/*
+*.swp
 test.out
