@@ -82,14 +82,19 @@ class ParseRASGeo(object):
             for line in self.geo_list:
                 outfile.write(str(line))
 
-    def return_xs_by_id(self, xs_id):
+    def return_xs_by_id(self, xs_id, rnd=False, digits=0):
+        """ Returns XS with ID xs_id. Rounds XS ids to digits decimal places if (rnd==True) """
         for item in self.geo_list:
             if isinstance(item, CrossSection):
-                if item.header.xs_id == xs_id:
-                    return item
+                if rnd:
+                    if round(item.header.xs_id, digits) == round(xs_id, digits):
+                        return item
+                else:
+                    if item.header.xs_id == xs_id:
+                        return item
         raise CrossSectionNotFound
 
-    def return_xs(self, xs_id, river, reach, strip=False):
+    def return_xs(self, xs_id, river, reach, strip=False, rnd=False, digits=0):
         """
         returns matching CrossSection if it is in self.geo_list. raises CrossSectionNotFound otherwise
         :param xs_id: cross section id number
@@ -98,18 +103,31 @@ class ParseRASGeo(object):
         :param strip: strips whitespace off river and reach if true
         :return: CrossSection object
         """
+        wanted_river = river
+        wanted_reach = reach
+        wanted_xs_id = xs_id
+
         if strip:
-            river = river.strip()
-            reach = reach.strip()
-            for item in self.geo_list:
-                if isinstance(item, CrossSection):
-                    if item.header.xs_id == xs_id and item.river.strip() == river and item.reach.strip() == reach:
-                        return item
-        else:
-            for item in self.geo_list:
-                if isinstance(item, CrossSection):
-                    if item.header.xs_id == xs_id and item.river == river and item.reach == reach:
-                        return item
+            wanted_river = river.strip()
+            wanted_reach = reach.strip()
+        if rnd:
+            wanted_xs_id = round(xs_id, digits)
+
+        for item in self.geo_list:
+            if isinstance(item, CrossSection):
+                test_river = item.river
+                test_reach = item.reach
+                test_xs_id = item.header.xs_id
+
+                if strip:
+                    test_river = test_river.strip()
+                    test_reach = test_reach.strip()
+                if rnd:
+                    test_xs_id = round(test_xs_id, digits)
+
+                # Rounding and strip is done, see if this is the right XS
+                if test_xs_id == wanted_xs_id and test_river == wanted_river and test_reach == wanted_reach:
+                    return item
         raise CrossSectionNotFound
 
     def extract_xs(self):
