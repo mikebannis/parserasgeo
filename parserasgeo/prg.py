@@ -207,8 +207,7 @@ def main():
     if True:
         xs_list = geo.extract_xs()
         for xs in xs_list:
-            if xs.skew.angle is not None:
-                print str(xs.header.xs_id)+','+str(xs.skew.angle)
+                print str(xs.header.xs_id)+','+str(xs.rating_curve.value1)
 
     if not True:
         for item in geo.geo_list:

@@ -42,6 +42,30 @@ class Levee(object):
     def __str__(self):
         return 'Levee=' + self.value  # + '\n' - not needed since it's just a dumb string (with the \n)
 
+class RatingCurve(object):
+    """
+    Rating Curves. This is poorly implemented and only grabs the values on the first line and not the
+    curve itself.
+    """
+    def __init__(self):
+        self.value1 = None
+        self.value2 = None
+
+    @staticmethod
+    def test(line):
+        if line.split('=')[0] == 'XS Rating Curve':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        temp = line.split('=')[1].split(',')
+        self.value1 = int(temp[0])
+        self.value2 = int(temp[1])
+        return next(geo_file)
+
+    def __str__(self):
+        return 'XS Rating Curve= ' + str(self.value1) + ' ,' + str(self.value2) + '\n' 
+
 
 class Skew(object):
     """
@@ -427,8 +451,9 @@ class CrossSection(object):
         self.bank_sta = BankStation()
         self.skew = Skew()
         self.levee = Levee()
+        self.rating_curve = RatingCurve()
         self.parts = [self.header, self.description, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
-                      self.sta_elev, self.skew, self.levee]
+                      self.sta_elev, self.skew, self.levee, self.rating_curve]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 
