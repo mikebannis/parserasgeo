@@ -13,3 +13,4 @@ test/prg_test.g00
 *.egg-info/*
 *.swp
 test.out
+*.out
