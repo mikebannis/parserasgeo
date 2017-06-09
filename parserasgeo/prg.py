@@ -10,6 +10,7 @@ Version 0.01
 """
 
 from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir, Junction
+import os.path
 
 # TODO - create geolist object
 
@@ -30,6 +31,12 @@ class ParseRASGeo(object):
         num_unknown = 0
         river = None
         reach = None
+
+        if geo_filename == '' or geo_filename is None:
+            raise AttributeError('Filename passed to ParseRASGeo is blank.')
+
+        if not os.path.isfile(geo_filename):
+            raise AttributeError('File ' + str(geo_filename) + ' does not appear to exist.')
 
         with open(geo_filename, 'rt') as geo_file:
             for line in geo_file:
