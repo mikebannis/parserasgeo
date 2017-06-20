@@ -1,5 +1,6 @@
 from tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 from description import Description
+from math import sqrt
 
 
 class Feature(object):
@@ -470,6 +471,30 @@ class CrossSection(object):
                 self.geo_list.append(line)
                 line = next(geo_file)
         return line
+
+    def cut_line_ratio(self):
+        """ 
+        Returns ratio of xs geometry length to cutline length. 
+        Raises AttributeError if either are empty
+        """
+        if self.cutline.points == []:
+            raise AttributeError('Cross section does not have a defined cutline')
+
+        if self.sta_elev.points == []:
+            raise AttributeError('Cross section does not have a geometry')
+
+        length = self.sta_elev.points[-1][0] - self.sta_elev.points[0][0]
+        
+        # Add up length of all segments of the cutline
+        cl_length = 0.0
+        last_pt = self.cutline.points[0]
+        for pt in self.cutline.points[1:]:
+            dist = sqrt((float(pt[0])-float(last_pt[0]))**2 + (float(pt[1])-float(last_pt[1]))**2)
+            cl_length += dist
+            last_pt = pt
+
+        return cl_length/length
+
 
     def __str__(self):
         s = ''
