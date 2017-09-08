@@ -6,7 +6,6 @@ This has NOT been extensively tested.
 
 Mike Bannister 2/24/2016
 
-Version 0.01
 """
 
 from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir, Junction
@@ -19,7 +18,7 @@ class CrossSectionNotFound(Exception):
     pass
 
 class ParseRASGeo(object):
-    def __init__(self, geo_filename, chatty=False):
+    def __init__(self, geo_filename, chatty=False, debug=False):
         # add  test for file existence
         self.geo_list = []
         num_xs = 0
@@ -32,22 +31,26 @@ class ParseRASGeo(object):
         river = None
         reach = None
 
+        if debug:
+            print 'Debugging is turned on'
+
         if geo_filename == '' or geo_filename is None:
             raise AttributeError('Filename passed to ParseRASGeo is blank.')
 
         if not os.path.isfile(geo_filename):
             raise AttributeError('File ' + str(geo_filename) + ' does not appear to exist.')
 
+        # TODO - add 'debug' to all objects
         with open(geo_filename, 'rt') as geo_file:
             for line in geo_file:
                 if RiverReach.test(line):
-                    rr = RiverReach()
+                    rr = RiverReach(debug)
                     rr.import_geo(line, geo_file)
                     river, reach = rr.header.river_name, rr.header.reach_name
                     num_river += 1
                     self.geo_list.append(rr)
                 elif CrossSection.test(line):
-                    xs = CrossSection(river, reach)
+                    xs = CrossSection(river, reach, debug)
                     xs.import_geo(line, geo_file)
                     num_xs += 1
                     self.geo_list.append(xs)
@@ -186,8 +189,8 @@ def main():
     infile = 'geos/SPR_Downstream.g04'
     infile = '../geos/SPR_Upstream.g02'
     outfile = '../test/test.out'
-
-    geo = ParseRASGeo(infile, chatty=True)
+    infile = r"Z:\UDFCD PLANNING\Big Dry Creek (Arapco) FHAD\H&H MODELS\HECRAS\Current_20170907\BDC_FHAD.g02"
+    geo = ParseRASGeo(infile, chatty=True, debug=True)
     
     if not True:
         for item in geo.geo_list:

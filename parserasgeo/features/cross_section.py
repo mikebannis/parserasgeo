@@ -1,7 +1,9 @@
 from tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 from description import Description
-from math import sqrt
+from math import sqrt, cos, radians
 
+# Global debug, this is set when initializing CrossSection
+DEBUG = False
 
 class Feature(object):
     """
@@ -92,7 +94,6 @@ class Skew(object):
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
-
         self.xs_id = None
         self.node_type = None
         self.lob_length = None
@@ -117,6 +118,11 @@ class Header(object):
         self.lob_length = vals[2]
         self.channel_length = vals[3]
         self.rob_length = vals[4]
+
+        if DEBUG:
+            print '-'*30
+            print 'Importing XS:', self.xs_id
+
         return next(geo_file)
 
     def __str__(self):
@@ -200,11 +206,14 @@ class StationElevation(object):
         """
         self.num_pts = int(line[10:])
         line = next(geo_file)
-        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
             vals = split_by_n(line, 8)
             for i in range(0, len(vals), 2):
                 self.points.append((vals[i], vals[i + 1]))
             line = next(geo_file)
+        if DEBUG:
+            print 'len(self.points)=', len(self.points), 'self.num_pts=', self.num_pts
+            # print self.points
         assert len(self.points) == self.num_pts
         return line
 
@@ -336,7 +345,7 @@ class Mannings_n(object):
         line = next(geo_file)
 
         # Make sure we're still reading n-values
-        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-'or line[:1] == '.':
             values = split_by_n(line, 8)
             assert len(values) % 3 == 0
             for i in range(0, len(values), 3):
@@ -436,7 +445,11 @@ class ExpansionContraction(object):
 
 
 class CrossSection(object):
-    def __init__(self, river, reach):
+    def __init__(self, river, reach, debug=False):
+        # Set global debug
+        global DEBUG
+        DEBUG = debug
+
         self.river = river
         self.reach = reach
 
@@ -477,6 +490,7 @@ class CrossSection(object):
         Returns ratio of xs geometry length to cutline length. 
         Raises AttributeError if either are empty
         """
+        # TODO - correct for skew!
         if self.cutline.points == []:
             raise AttributeError('Cross section does not have a defined cutline')
 
@@ -484,6 +498,8 @@ class CrossSection(object):
             raise AttributeError('Cross section does not have a geometry')
 
         length = self.sta_elev.points[-1][0] - self.sta_elev.points[0][0]
+        # the line below should work, but needs to be tested 
+        #length = length/cos(radians(self.skew.angle))
         
         # Add up length of all segments of the cutline
         cl_length = 0.0
