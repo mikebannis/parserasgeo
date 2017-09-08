@@ -5,6 +5,7 @@ rasgeotool - tools for importing, modifying, and exporting HEC-RAS geometry file
 This has NOT been extensively tested.
 
 Mike Bannister 2/24/2016
+mike.bannister@respec.com
 
 """
 
