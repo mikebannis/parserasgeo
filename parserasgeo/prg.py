@@ -119,6 +119,10 @@ class ParseRASGeo(object):
         wanted_xs_id = xs_id
 
         if strip:
+            if type(river) is not str and type(river) is not unicode:
+                raise AttributeError('For XS '+str(xs_id)+' "river" is not a string, got:'+str(river)+' instead.')
+            if type(reach) is not str and type(reach) is not unicode:
+                raise AttributeError('For XS '+str(xs_id)+' "reach" is not a string, got:'+str(reach)+' instead.')
             wanted_river = river.strip()
             wanted_reach = reach.strip()
         if rnd:
