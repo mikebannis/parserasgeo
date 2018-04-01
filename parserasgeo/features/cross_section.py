@@ -113,6 +113,9 @@ class Header(object):
         vals = [fl_int(x) for x in fields]
         # Node type and cross section id
         self.node_type = vals[0]
+        # TODO - RAS allows Xs ids to be in the format '225.20', fl_int() strips trailing zeros
+        # This should be fixed at some point, but may break compatibility with other things
+        # like the FHAD tools, and probably things within prg
         self.xs_id = vals[1]
         # Reach lengths
         self.lob_length = vals[2]
