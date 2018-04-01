@@ -347,7 +347,8 @@ class Mannings_n(object):
         # Make sure we're still reading n-values
         while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-'or line[:1] == '.':
             values = split_by_n(line, 8)
-            assert len(values) % 3 == 0
+            if len(values) % 3 != 0:
+                raise ValueError ('Error processing n-values: ' + line + '\n' + str(values))
             for i in range(0, len(values), 3):
                 self.values.append((values[i], values[i + 1], values[i + 2]))
             line = next(geo_file)

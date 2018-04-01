@@ -73,7 +73,7 @@ def fl_int(value):
 def print_list_by_group(values, width, num_columns):
     """
     Returns string of items in list values padded left to width in width, with num_columns of items per line.
-    Lines are separated by newlines. No error thrown if value[i] width exceeds width.
+    Lines are separated by newlines. Width of items in values are shortened to 'width'.
 
     :param values: list of values to convert to string
     :param width: width of white space padded columns
@@ -96,6 +96,8 @@ def print_list_by_group(values, width, num_columns):
                 temp = temp[1:width+1]
             elif temp[:2] == '0.':
                 temp = ' ' + temp[1:]
+            elif len(temp) > width:
+                temp = temp[:width]
             temp = temp.replace(' 0.', '  .')
             temp = temp.replace('-0.', ' -.')
 

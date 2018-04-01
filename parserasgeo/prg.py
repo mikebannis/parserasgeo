@@ -94,7 +94,13 @@ class ParseRASGeo(object):
                 outfile.write(str(line))
 
     def return_xs_by_id(self, xs_id, rnd=False, digits=0):
-        """ Returns XS with ID xs_id. Rounds XS ids to digits decimal places if (rnd==True) """
+        """ 
+        Returns XS with ID xs_id. Rounds XS ids to digits decimal places if (rnd==True) 
+        :param xs_id: id of cross section, assumed to be in ..... format
+        :param rnd: rounds xs_id to 'digits' if True
+        :param digits: number of digits to round xs_id to 
+        :return: CrossSection object
+        """
         for item in self.geo_list:
             if isinstance(item, CrossSection):
                 if rnd:
