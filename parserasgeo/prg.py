@@ -153,8 +153,7 @@ class ParseRASGeo(object):
 
     def extract_xs(self):
         """
-        :param geo_list: list of RAS geometry from import_ras_geo()
-        :return: returns list of all cross sections in geo_list
+        Returns list of all cross sections in geometry
         """
         new_geo_list = []
         for item in self.geo_list:

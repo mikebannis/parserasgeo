@@ -326,8 +326,8 @@ class Obstruction(object):
 
 
 class Mannings_n(object):
-    def __init__(self):
-        self.values = []  # [(n1, sta1, 0), (n2, sta2, 0), ...]
+	def __init__(self):
+        self.values = []  # [(sta1, n1, 0), (sta2, n2, 0), ...]
         self.horizontal = None  # 0 or -1
 
     @staticmethod
