@@ -11,7 +11,10 @@ import parserasgeo as prg
 def main():
     outfile = 'test.out'
     test_files = glob.glob('../geos/*.g??')
-    print test_files
+    print len(test_files)
+    for x in test_files:
+        #print type(x), x
+        print  x
 
     for test_file in test_files:
         print '*' * 100,

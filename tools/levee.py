@@ -7,6 +7,7 @@ def main():
     infile = r"Z:\UDFCD PLANNING\FHAD Review\Niver Round 3\Orig\20161012 FHAD Submittal\HEC-RAS\NiverCreek_FHAD_Sept.g01"
     #infile = r"Z:\UDFCD PLANNING\FHAD Review\SPR - 6th to 58th\Orig\20160907 Merrick_SPR 6th-58th_08-26-2016\SPR 6th-58th_Existing_HECRAS\SPR_Downstream.g04"
     infile = r"Z:\UDFCD PLANNING\FHAD Review\South Platte\Orig\20160629 5-27-16 SPR FHAD submittal\5-27-16 submittal\HEC-RAS\SouthPlatteFHAD.g08"
+    infile = r"Z:\UDFCD PLANNING\Second Creek\12 FHAD\01_RAS\HEC-RAS\Submittal 2 - working\SCFHAD.g02"
 
 
 

@@ -5,6 +5,7 @@ def main():
     #infile = r"Z:\UDFCD PLANNING\Grange Hall Creek\02 HYDRAULICS\HEC-RAS\GHC_FHAD.g01"
     infile = r"Z:\UDFCD PLANNING\FHAD Review\Sloans Lake Round 1\Orig\20161013 - Sloan'sLake_FHAD_HEC-RAS-20161007\HEC-RAS\SloansFHAD2017.g01"
     infile = r"Z:\UDFCD PLANNING\FHAD Review\Clear Creek Round 1\Orig\20161013 Review Submittal\ClearCreek_ModelReviewSubmittal\Hydraulics\ClearCreek_FHAD2016.g07"
+    infile = r"Z:\UDFCD PLANNING\Second Creek\12 FHAD\01_RAS\HEC-RAS\Submittal 2 - working\SCFHAD.g02"
 
     geo = prg.ParseRASGeo(infile)
     cross_sections = geo.extract_xs()
