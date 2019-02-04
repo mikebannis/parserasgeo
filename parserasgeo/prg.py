@@ -56,7 +56,7 @@ class ParseRASGeo(object):
                     num_xs += 1
                     self.geo_list.append(xs)
                 elif Culvert.test(line):
-                    culvert = Culvert(river, reach)
+                    culvert = Culvert(river, reach, debug)
                     culvert.import_geo(line, geo_file)
                     num_culvert += 1
                     self.geo_list.append(culvert)
@@ -158,6 +158,16 @@ class ParseRASGeo(object):
         new_geo_list = []
         for item in self.geo_list:
             if isinstance(item, CrossSection):
+                new_geo_list.append(item)
+        return new_geo_list
+
+    def extract_culverts(self):
+        """
+        Returns list of all culverts in geometry
+        """
+        new_geo_list = []
+        for item in self.geo_list:
+            if isinstance(item, Culvert):
                 new_geo_list.append(item)
         return new_geo_list
 

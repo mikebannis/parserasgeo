@@ -2,6 +2,8 @@ from tools import fl_int, split_by_n #  , split_by_n_str, pad_left, print_list_b
 from description import Description
 from collections import namedtuple
 
+DEBUG = False
+
 class Feature(object):
     """
     This is a template for other features.
@@ -40,6 +42,8 @@ class Header(object):
 
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
+        if DEBUG:
+                print('fields:', fields)
         assert len(fields) == 5
         # vals = [fl_int(x) for x in fields]
         # Node type and cross section id
@@ -49,6 +53,8 @@ class Header(object):
         self.value1 = fields[2]
         self.value2 = fields[3]
         self.value3 = fields[4]
+        if DEBUG:
+            print ('Imported culvert:', str(self.station))
         return next(geo_file)
    
     def __str__(self):
@@ -289,7 +295,10 @@ class CulvertGroup(object):
         return s
         
 class Culvert(object):
-    def __init__(self, river, reach):
+    def __init__(self, river, reach, debug=False):
+        global DEBUG
+        DEBUG = debug
+
         self.river = river
         self.reach = reach
 
