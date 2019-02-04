@@ -1,6 +1,9 @@
+from __future__ import print_function
 from tools import fl_int, split_by_n #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 from description import Description
 from collections import namedtuple
+
+import sys
 
 DEBUG = False
 
@@ -194,10 +197,14 @@ class CulvertGroup(object):
             if description == 'Culvert Bottom n':
                 self.manning_bot = float(value)
             elif description == 'Culvert Bottom Depth':
-                self.depth_manning_bot = fl_int(value)
+                # sometimes there is no Culvert Bottom Depth, but the line "Culver Bottom Depth=" is still in the geo file
+                try:
+                    self.depth_manning_bot = fl_int(value)
+                except ValueError:
+                    self.depth_manning_bot = ''
             else:
                 self.depth_blocked = fl_int(value)
-            
+
             line = next(geo_file)
             
         return line
