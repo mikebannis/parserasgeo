@@ -18,7 +18,7 @@ def split_by_n(line, n):
 
 def split_by_n_str(line, n):
     """
-    Splits line in to a list of n length strings. This differs from _split_by_n() which returns fl_int()
+    Splits line in to a list of n length strings. This differs from split_by_n() which returns fl_int()
     :param line:  string
     :param n: int
     :return: list of strings
@@ -115,5 +115,3 @@ def pad_left(guts, pad_number):
     :return: string
     """
     return ('{:>'+str(pad_number)+'}').format(guts)
-
-

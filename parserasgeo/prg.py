@@ -79,7 +79,7 @@ class ParseRASGeo(object):
                     # Unknown line encountered. Store it as text.
                     self.geo_list.append(line)
                     num_unknown += 1
-        if chatty:      
+        if chatty:
             print str(num_river)+' rivers/reaches imported'
             print str(num_junc)+' junctions imported'
             print str(num_xs)+' cross sections imported'
@@ -94,11 +94,11 @@ class ParseRASGeo(object):
                 outfile.write(str(line))
 
     def return_xs_by_id(self, xs_id, rnd=False, digits=0):
-        """ 
-        Returns XS with ID xs_id. Rounds XS ids to digits decimal places if (rnd==True) 
+        """
+        Returns XS with ID xs_id. Rounds XS ids to digits decimal places if (rnd==True)
         :param xs_id: id of cross section, assumed to be in ..... format
         :param rnd: rounds xs_id to 'digits' if True
-        :param digits: number of digits to round xs_id to 
+        :param digits: number of digits to round xs_id to
         :return: CrossSection object
         """
         for item in self.geo_list:
@@ -201,24 +201,17 @@ class ParseRASGeo(object):
 
 
 def main():
-    infile = 'geos/201601BigDryCreek.g27'
-    #infile = '../geos/GHC_FHAD.g01'
-    #infile = 'test/CCRC_prg_test.g01'
-    infile = 'geos/SBK_PMR.g02'
-    infile = 'geos/GHC_working.g43'
-    infile = 'geos/SPR_Downstream.g04'
-    infile = '../geos/SPR_Upstream.g02'
     outfile = '../test/test.out'
-    infile = r"Z:\UDFCD PLANNING\Big Dry Creek (Arapco) FHAD\H&H MODELS\HECRAS\Current_20170907\BDC_FHAD.g02"
+    infile = '../geos/third/third_final.g01'
     geo = ParseRASGeo(infile, chatty=True, debug=True)
-    
+
     if not True:
         for item in geo.geo_list:
             if type(item) is Culvert:
                 print '-'*50
                 print 'bridge/culvert', item.header.station
                 print str(item)
-    
+
     if not True:
         for item in geo.geo_list:
             if hasattr(item, 'description'):
@@ -226,15 +219,15 @@ def main():
                     print type(item)
                     print item.description
 
-    if True:
+    if not True:
         count = 0
         for item in geo.geo_list:
             if type(item) is str:
                 count += 1
                 print 'unknown: ', str(item),
         print count, 'unknown lines'
-                    
-    if True:
+
+    if not True:
         xs_list = geo.extract_xs()
         for xs in xs_list:
                 print str(xs.header.xs_id)+','+str(xs.rating_curve.value1)
@@ -245,8 +238,9 @@ def main():
                 print 'Junction', item.header.name
 
     geo.write(outfile)
-    
-    if True: 
+
+    if True:
+        print 'Comparing', infile, 'and', outfile
         import filecmp
         import subprocess
         if filecmp.cmp(infile, outfile, shallow=False):
