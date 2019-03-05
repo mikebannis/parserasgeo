@@ -11,13 +11,13 @@ import parserasgeo as prg
 def main():
     outfile = 'test.out'
     test_files = glob.glob('../geos/*.g??')
-    print len(test_files)
-    for x in test_files:
+    #print len(test_files)
+    #for x in test_files:
         #print type(x), x
-        print  x
+    #    print  x
 
     for test_file in test_files:
-        print '*' * 100,
+        print '*' * 30,
         print 'Processing ', test_file
         geo = prg.ParseRASGeo(test_file)
         geo.write(outfile)
