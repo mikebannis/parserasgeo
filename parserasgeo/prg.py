@@ -9,7 +9,7 @@ mike.bannister@respec.com
 
 """
 
-from features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir, Junction
+from .features import CrossSection, RiverReach, Culvert, Bridge, LateralWeir, Junction
 import os.path
 
 # TODO - create geolist object
@@ -33,7 +33,7 @@ class ParseRASGeo(object):
         reach = None
 
         if debug:
-            print 'Debugging is turned on'
+            print('Debugging is turned on')
 
         if geo_filename == '' or geo_filename is None:
             raise AttributeError('Filename passed to ParseRASGeo is blank.')
@@ -80,13 +80,13 @@ class ParseRASGeo(object):
                     self.geo_list.append(line)
                     num_unknown += 1
         if chatty:
-            print str(num_river)+' rivers/reaches imported'
-            print str(num_junc)+' junctions imported'
-            print str(num_xs)+' cross sections imported'
-            print str(num_bridge)+' bridge imported'
-            print str(num_culvert)+' culverts imported'
-            print str(num_lat_weir)+' lateral structures imported'
-            print str(num_unknown) + ' unknown lines imported'
+            print(str(num_river)+' rivers/reaches imported')
+            print(str(num_junc)+' junctions imported')
+            print(str(num_xs)+' cross sections imported')
+            print(str(num_bridge)+' bridge imported')
+            print(str(num_culvert)+' culverts imported')
+            print(str(num_lat_weir)+' lateral structures imported')
+            print(str(num_unknown) + ' unknown lines imported')
 
     def write(self, out_geo_filename):
         with open(out_geo_filename, 'wt') as outfile:
@@ -208,45 +208,45 @@ def main():
     if not True:
         for item in geo.geo_list:
             if type(item) is Culvert:
-                print '-'*50
-                print 'bridge/culvert', item.header.station
-                print str(item)
+                print('-'*50)
+                print('bridge/culvert', item.header.station)
+                print(str(item))
 
     if not True:
         for item in geo.geo_list:
             if hasattr(item, 'description'):
                 if item.description is not []:
-                    print type(item)
-                    print item.description
+                    print(type(item))
+                    print(item.description)
 
     if not True:
         count = 0
         for item in geo.geo_list:
             if type(item) is str:
                 count += 1
-                print 'unknown: ', str(item),
-        print count, 'unknown lines'
+                print('unknown: ', str(item),)
+        print(count, 'unknown lines')
 
     if not True:
         xs_list = geo.extract_xs()
         for xs in xs_list:
-                print str(xs.header.xs_id)+','+str(xs.rating_curve.value1)
+                print(str(xs.header.xs_id)+','+str(xs.rating_curve.value1))
 
     if not True:
         for item in geo.geo_list:
             if type(item) is Junction:
-                print 'Junction', item.header.name
+                print('Junction', item.header.name)
 
     geo.write(outfile)
 
     if True:
-        print 'Comparing', infile, 'and', outfile
+        print('Comparing', infile, 'and', outfile)
         import filecmp
         import subprocess
         if filecmp.cmp(infile, outfile, shallow=False):
-            print 'Input and output files are identical'
+            print('Input and output files are identical')
         else:
-            print 'WARNING: files are different!!!'
+            print('WARNING: files are different!!!')
             subprocess.Popen(["diff", infile, outfile])
 
 if __name__ == '__main__':

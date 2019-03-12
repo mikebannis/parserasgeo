@@ -1,6 +1,6 @@
 from __future__ import print_function
-from tools import fl_int, split_by_n, print_list_by_group#  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-from description import Description
+from .tools import fl_int, split_by_n, print_list_by_group#  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
+from .description import Description
 from collections import namedtuple
 from math import ceil
 

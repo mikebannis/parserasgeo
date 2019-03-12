@@ -1,5 +1,5 @@
-from tools import fl_int #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-from description import Description
+from .tools import fl_int #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
+from .description import Description
 
 class Feature(object):
     """

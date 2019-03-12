@@ -1,4 +1,4 @@
-from tools import  split_by_n_str
+from .tools import  split_by_n_str
 # Global debug, this is set when initializing RiverReach
 DEBUG = False
 
@@ -36,7 +36,7 @@ class RiverReach(object):
         self.parts = [self.header, self.geo, self.text]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
-        
+
     def import_geo(self, line, geo_file):
         while line != '\n':
             for part in self.parts:
@@ -79,8 +79,8 @@ class Header(object):
         self.river_name = fields[0]
         self.reach_name = fields[1][:-1]
         if DEBUG:
-            print '*'*50
-            print 'Imported river/reach:', self.river_name, '/', self.reach_name
+            print('*'*50)
+            print('Imported river/reach:', self.river_name, '/', self.reach_name)
         return next(geo_file)
 
     def __str__(self):
