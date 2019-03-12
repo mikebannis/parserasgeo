@@ -14,3 +14,4 @@ test/prg_test.g00
 *.swp
 test.out
 *.out
+*uselesschange
