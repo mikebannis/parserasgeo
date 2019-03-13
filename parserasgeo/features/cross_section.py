@@ -230,6 +230,60 @@ class StationElevation(object):
         return s
 
 
+class Vert_Manning_n(object):
+    def __init__(self):
+        self.num_vert_n_elev = None
+        self.num_vert_n_sta = None
+        self.num_vert_n_flow = None
+        self.vert_n_elev = []
+        self.vert_n_sta = []
+
+    @staticmethod
+    def test(line):
+        if line[:22] == 'Vertical n Elevations=':
+            return True
+        return False
+
+    def import_geo(self, line, geo_file):
+        self.num_vert_n_elev = int(line[22:])
+        line =next(geo_file)
+
+        #Process vertical elevations
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
+            vals = split_block_obs(line, 8)
+            for i in range(0, len(vals), 1):
+                self.vert_n_elev.append(vals[i])
+            line = next(geo_file)
+        assert self.num_vert_n_elev == len(self.vert_n_elev)
+
+        #process vertical n stations
+        if line[:23] != 'Vertical n for Station=':
+            raise ValueError("Vertical n for Station= does not follow Vertical n Elevations= in geometry file. Aborting.")
+        self.num_vert_n_sta = int(line[23:])
+        line = next(geo_file)
+        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
+            vals = split_block_obs(line, 8)
+            for i in range(0, len(vals), 1):
+                self.vert_n_sta.append(vals[i])
+            line = next(geo_file)
+        assert self.num_vert_n_elev == len(self.vert_n_sta)
+
+        #process vertical n follow
+        if line[:16] != 'Vertical n Flow=':
+            raise ValueError('Vertical n Flow= does not follow Vercial n Elevations in Geometry file. Aborting')
+        self.num_vert_n_flow = int(line[16:])
+        line = next(geo_file)
+        return line
+
+    def __str__(self):
+        s = 'Vertical n Elevations= ' + str(self.num_vert_n_elev) + '\n'
+        s += print_list_by_group(self.vert_n_elev,8,10)
+        s += 'Vertical n for Station=' + str(self.num_vert_n_sta) + '\n'
+        s += print_list_by_group(self.vert_n_sta,8,10)
+        s += 'Vertical n Flow=' + str(self.num_vert_n_flow) + '\n'
+        return s
+
+
 class IEFA(object):
     def __init__(self):
         self.num_iefa = None
@@ -466,12 +520,13 @@ class CrossSection(object):
         self.iefa = IEFA()
         self.mannings_n = Mannings_n()
         self.obstruct = Obstruction()
+        self.vert_manning_n = Vert_Manning_n()
         self.bank_sta = BankStation()
         self.skew = Skew()
         self.levee = Levee()
         self.rating_curve = RatingCurve()
         self.parts = [self.header, self.description, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
-                      self.sta_elev, self.skew, self.levee, self.rating_curve]
+                      self.sta_elev, self.skew, self.levee, self.rating_curve,self.vert_manning_n]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 
