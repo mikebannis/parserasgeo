@@ -428,6 +428,12 @@ class BankStation(object):
 
     def __str__(self):
         return 'Bank Sta=' + str(self.left) + ',' + str(self.right) + '\n'
+    
+class BankStationError(Exception):
+    """
+    An error if the bank stations are not correct
+    """
+    pass
 
 # TODO: implement contraction/expansion
 class ExpansionContraction(object):
@@ -514,6 +520,76 @@ class CrossSection(object):
             last_pt = pt
 
         return cl_length/length
+    
+    def define_channel_n(self):
+        """
+        Checks if the bank stations are represented in Manning's n (i.e. if Manning's n is defined at the statiosn that correspond with the bank stations)
+        If they are not defined at the bank stations, add Manning's n values at those points.
+        """
+        
+        left_bank = self.bank_sta.left
+        right_bank = self.bank_sta.right
+        banks = [left_bank, right_bank]
+        
+        manning_tuples = self.mannings_n.values
+        manning_stations = [x[0] for x in manning_tuples]
+        
+        for bank in banks:
+            # if the bank station is not in the list, grab the Manning's n to the left
+            if bank not in manning_stations:
+                left_manning = [x[1] for x in manning_tuples if x[0] < bank]
+                left_index = len(left_manning)
+                left_manning = left_manning[-1]
+                manning_insert = (bank, left_manning, 0)
+                manning_tuples.insert(left_index, manning_insert)
+        
+        # do not pull the n-value at the right bank because that defines the n-values to the right of the bank
+        self.channel_n = [x for x in manning_tuples if (x[0] >= banks[0] and x[0] < banks[1])]        
+            
+    def alter_channel_n(self, scalar):
+        """
+        Alters the channel n-values by a scaling factor
+        """
+        
+        if self.channel_n is not None:
+            new_channel_n = []
+            for n in self.channel_n:
+                temp_n = n[1]*scalar
+                temp_tuple = (n[0], temp_n, 0)
+                new_channel_n.append(temp_tuple)
+            
+            ind = 0
+            for old_n in self.mannings_n.values:
+                for new_n in new_channel_n:
+                    if old_n[0] == new_n[0]:
+                        self.mannings_n.values.pop(ind)
+                        self.mannings_n.values.insert(ind, new_n)
+                        break
+                ind += 1
+                
+            self.channel_n = new_channel_n
+        else:
+            pass
+
+    def bank_station_change(self, constant):
+        """
+        Move the bank stations by constant [ft] if the user deems the original model to not be accurate
+        If constant > 0, the stations move outward
+        If cosntant < 0, the stations move inward
+        """
+        
+        self.bank_sta.left -= constant
+        self.bank_sta.right += constant
+        
+        if self.bank_sta.left >= self.bank_sta.right:
+            raise BankStationError('left bank >= right bank for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
+        
+        if self.bank_sta.left < 0:
+            raise BankStationError('left bank < 0 for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
+        
+        if self.bank_sta.right > self.sta_elev.points[-1][0]:
+            raise BankStationError('right bank > last bank station for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
+
 
 
     def __str__(self):
