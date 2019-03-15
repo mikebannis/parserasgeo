@@ -95,7 +95,6 @@ class Skew(object):
 class Header(object):
     def __init__(self):
         self.xs_id = None
-        self.xs_id_str = None
         self.node_type = None
         self.lob_length = None
         self.channel_length = None
@@ -111,9 +110,6 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
         assert len(fields) == 5
-
-        self.xs_id_str = fields[1]
-
         vals = [fl_int(x) for x in fields]
         # Node type and cross section id
         self.node_type = vals[0]
@@ -135,7 +131,7 @@ class Header(object):
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
-        s += str(self.xs_id_str) + ','
+        s += '{:<8}'.format(str(self.xs_id)) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
         return s
 
@@ -231,60 +227,6 @@ class StationElevation(object):
         # convert to padded columns of 8
         temp_str = print_list_by_group(sta_elev_list, 8, 10)
         s += temp_str
-        return s
-
-
-class Vert_Manning_n(object):
-    def __init__(self):
-        self.num_vert_n_elev = None
-        self.num_vert_n_sta = None
-        self.num_vert_n_flow = None
-        self.vert_n_elev = []
-        self.vert_n_sta = []
-
-    @staticmethod
-    def test(line):
-        if line[:22] == 'Vertical n Elevations=':
-            return True
-        return False
-
-    def import_geo(self, line, geo_file):
-        self.num_vert_n_elev = int(line[22:])
-        line =next(geo_file)
-
-        #Process vertical elevations
-        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
-            vals = split_block_obs(line, 8)
-            for i in range(0, len(vals), 1):
-                self.vert_n_elev.append(vals[i])
-            line = next(geo_file)
-        assert self.num_vert_n_elev == len(self.vert_n_elev)
-
-        #process vertical n stations
-        if line[:23] != 'Vertical n for Station=':
-            raise ValueError("Vertical n for Station= does not follow Vertical n Elevations= in geometry file. Aborting.")
-        self.num_vert_n_sta = int(line[23:])
-        line = next(geo_file)
-        while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
-            vals = split_block_obs(line, 8)
-            for i in range(0, len(vals), 1):
-                self.vert_n_sta.append(vals[i])
-            line = next(geo_file)
-        assert self.num_vert_n_elev == len(self.vert_n_sta)
-
-        #process vertical n follow
-        if line[:16] != 'Vertical n Flow=':
-            raise ValueError('Vertical n Flow= does not follow Vercial n Elevations in Geometry file. Aborting')
-        self.num_vert_n_flow = int(line[16:])
-        line = next(geo_file)
-        return line
-
-    def __str__(self):
-        s = 'Vertical n Elevations= ' + str(self.num_vert_n_elev) + '\n'
-        s += print_list_by_group(self.vert_n_elev,8,10)
-        s += 'Vertical n for Station=' + str(self.num_vert_n_sta) + '\n'
-        s += print_list_by_group(self.vert_n_sta,8,10)
-        s += 'Vertical n Flow=' + str(self.num_vert_n_flow) + '\n'
         return s
 
 
@@ -524,13 +466,12 @@ class CrossSection(object):
         self.iefa = IEFA()
         self.mannings_n = Mannings_n()
         self.obstruct = Obstruction()
-        self.vert_manning_n = Vert_Manning_n()
         self.bank_sta = BankStation()
         self.skew = Skew()
         self.levee = Levee()
         self.rating_curve = RatingCurve()
         self.parts = [self.header, self.description, self.cutline, self.iefa, self.mannings_n, self.obstruct, self.bank_sta,
-                      self.sta_elev, self.skew, self.levee, self.rating_curve,self.vert_manning_n]
+                      self.sta_elev, self.skew, self.levee, self.rating_curve]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
 
