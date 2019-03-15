@@ -64,8 +64,6 @@ def fl_int(value):
     :param value: string to convert
     :return: returns int or float
     """
-    #check to see if value  contains an asterik
-    value = value.replace('*','')
     x = float(value)
     if x.is_integer():
         x = int(x)
