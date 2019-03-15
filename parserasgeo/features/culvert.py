@@ -119,6 +119,7 @@ class Deck(object):
         self.num_dn = fl_int(values[5])  # Number of d/s sta/elev points
 
         # All coefficients after num_dn are simply saved as text at this point
+        ### TODO: parse remaining coefficients
         self.other_coef = ','.join(values[6:])
         #self.min_lo_chord = fl_int(values[6])
         #self.max_hi_cord = fl_int(values[7])
@@ -131,9 +132,6 @@ class Deck(object):
         self.us_sta = self._read_block(geo_file, up_rows)
         self.us_elev = self._read_block(geo_file, up_rows)
         self.us_low_chord = self._read_low_chords(geo_file, up_rows)
-        #print(self.us_sta)
-        #print(self.us_elev)
-        #print(self.us_low_chord)
         down_rows = int(ceil(self.num_dn/10.0))
         self.ds_sta = self._read_block(geo_file, down_rows)
         self.ds_elev = self._read_block(geo_file, down_rows)
@@ -142,14 +140,29 @@ class Deck(object):
 
     @staticmethod
     def _read_block(geo_file, rows):
+        """
+        Parse station and elevation blocks
+
+        :param geo_file: file object for geometry file
+        :param rows: number of rows to read and parse
+        :returns: list of float/ints
+        """
         temp = []
         for _ in range(rows):
             line = next(geo_file)
             temp += split_by_n(line, 8)
         return temp
 
+    ### TODO: read and store low chords as something useful
     @staticmethod
     def _read_low_chords(geo_file, rows):
+        """
+        Read low chords as strings
+
+        :param geo_file: file object for geometry file
+        :param rows: number of rows to read and parse
+        :returns: list of strings, each string represent a full line
+        """
         temp = []
         for _ in range(rows):
             line = next(geo_file)
@@ -174,6 +187,7 @@ class Deck(object):
         s += print_list_by_group(self.ds_elev, 8, 10)
         s += ''.join(self.ds_low_chord)
         return s
+
 
 class CulvertGroup(object):
     """
