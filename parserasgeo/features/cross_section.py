@@ -5,6 +5,20 @@ from math import sqrt, cos, radians
 # Global debug, this is set when initializing CrossSection
 DEBUG = False
 
+class BankStationError(Exception):
+    """
+    An error if the bank stations are not correct
+    
+    e.g. left bank station > right bank station, right bank station > last station
+    """
+    pass
+
+class ChannelNError(Exception):
+    """
+    An error to raise if the user attempts to change channel n values without first defining the channel
+    """
+    pass
+
 class Feature(object):
     """
     This is a template for other features.
@@ -23,7 +37,6 @@ class Feature(object):
 
     def __str__(self):
         pass
-
 
 class Levee(object):
     """
@@ -428,12 +441,6 @@ class BankStation(object):
 
     def __str__(self):
         return 'Bank Sta=' + str(self.left) + ',' + str(self.right) + '\n'
-    
-class BankStationError(Exception):
-    """
-    An error if the bank stations are not correct
-    """
-    pass
 
 # TODO: implement contraction/expansion
 class ExpansionContraction(object):
@@ -480,7 +487,11 @@ class CrossSection(object):
                       self.sta_elev, self.skew, self.levee, self.rating_curve]
 
         self.geo_list = []  # holds all parts and unknown lines (as strings)
-
+        
+        # used to define n-values in the channel only (i.e. between the bank stations)
+        # gets defined in define_channel_n
+        self.channel_n = None
+        
     def import_geo(self, line, geo_file):
         while line != '\n':
             for part in self.parts:
@@ -523,32 +534,32 @@ class CrossSection(object):
     
     def define_channel_n(self):
         """
-        Checks if the bank stations are represented in Manning's n (i.e. if Manning's n is defined at the statiosn that correspond with the bank stations)
-        If they are not defined at the bank stations, add Manning's n values at those points.
+        Checks if the Manning's n is defined at the bank stations
+        If they are not defined at the bank stations, add Manning's n values at those points that correspond with the nearest-left n-value
+        
+        :returns: None
         """
+        manning_stations = [x[0] for x in self.mannings_n.values]
         
-        left_bank = self.bank_sta.left
-        right_bank = self.bank_sta.right
-        banks = [left_bank, right_bank]
-        
-        manning_tuples = self.mannings_n.values
-        manning_stations = [x[0] for x in manning_tuples]
-        
-        for bank in banks:
+        for bank in [self.bank_sta.left, self.bank_sta.right]:
             # if the bank station is not in the list, grab the Manning's n to the left
             if bank not in manning_stations:
-                left_manning = [x[1] for x in manning_tuples if x[0] < bank]
-                left_index = len(left_manning)
-                left_manning = left_manning[-1]
-                manning_insert = (bank, left_manning, 0)
-                manning_tuples.insert(left_index, manning_insert)
+                leftward_manning_all = [x[1] for x in self.mannings_n.values if x[0] < bank]
+                leftward_index = len(leftward_manning_all)
+                leftward_manning_nearest = leftward_manning_all[-1]
+                manning_insert = (bank, leftward_manning_nearest, 0)
+                self.mannings_n.values.insert(leftward_index, manning_insert)
         
         # do not pull the n-value at the right bank because that defines the n-values to the right of the bank
-        self.channel_n = [x for x in manning_tuples if (x[0] >= banks[0] and x[0] < banks[1])]        
+        self.channel_n = [x for x in self.mannings_n.values if (x[0] >= self.bank_sta.left and x[0] <self.bank_sta.right)]        
             
     def alter_channel_n(self, scalar):
         """
         Alters the channel n-values by a scaling factor
+        
+        :param scalar: a number by which the channel n values are scaled
+        :returns: None
+        :raises ChannelNError: raises error if channel_n not defined
         """
         
         if self.channel_n is not None:
@@ -558,24 +569,26 @@ class CrossSection(object):
                 temp_tuple = (n[0], temp_n, 0)
                 new_channel_n.append(temp_tuple)
             
-            ind = 0
-            for old_n in self.mannings_n.values:
+            for ind, old_n in enumerate(self.mannings_n.values):
                 for new_n in new_channel_n:
                     if old_n[0] == new_n[0]:
                         self.mannings_n.values.pop(ind)
                         self.mannings_n.values.insert(ind, new_n)
                         break
-                ind += 1
                 
             self.channel_n = new_channel_n
         else:
-            pass
+            raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_channel_n')
 
     def bank_station_change(self, constant):
         """
         Move the bank stations by constant [ft] if the user deems the original model to not be accurate
         If constant > 0, the stations move outward
         If cosntant < 0, the stations move inward
+        
+        :param constant: constant by which the stations are moved
+        :returns: None
+        :raises BankStationError: riases error if moving the bank statiosn crates impossible situations (e.g. left bank > right bank)
         """
         
         self.bank_sta.left -= constant
@@ -588,8 +601,7 @@ class CrossSection(object):
             raise BankStationError('left bank < 0 for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
         
         if self.bank_sta.right > self.sta_elev.points[-1][0]:
-            raise BankStationError('right bank > last bank station for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
-
+            raise BankStationError('right bank > last station for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
 
 
     def __str__(self):
@@ -601,4 +613,3 @@ class CrossSection(object):
     @staticmethod
     def test(line):
         return Header.test(line)
-
