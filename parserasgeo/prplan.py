@@ -17,13 +17,13 @@ class ParseRASPlan(object):
         with open(plan_filename, 'rt') as plan_file:
             for line in plan_file:
                 fields = line[:-1].split('=')  # Strip the newline and split by =
-                
+
                 # lookout for lines missing =
                 if len(fields) == 1:
                     continue
                 var = fields[0]
                 value = fields[1]
-                
+
                 if var == 'Geom File':
                     self.geo_file = value
                 elif var == 'Flow File':
@@ -44,8 +44,8 @@ def main():
     import sys
 
     prp = ParseRASPlan(sys.argv[1])
-    print dir(prp)
-    print str(prp)
+    print(dir(prp))
+    print(str(prp))
 
 
 if __name__ == '__main__':

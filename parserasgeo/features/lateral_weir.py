@@ -1,5 +1,5 @@
-from tools import fl_int #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-from description import Description
+from .tools import fl_int #  , split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
+from .description import Description
 
 class Feature(object):
     """
@@ -56,7 +56,7 @@ class Header(object):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
         s += '{:<8}'.format(str(self.station)) + ','
-        s += str(self.value1) + ',' + str(self.value2) + ',' + str(self.value3)  # + '\n' TODO: Add this back it later once the remainder of the 
+        s += str(self.value1) + ',' + str(self.value2) + ',' + str(self.value3)  # + '\n' TODO: Add this back it later once the remainder of the
                                                                                                     # header if figured out
         return s
 

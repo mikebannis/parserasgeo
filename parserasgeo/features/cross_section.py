@@ -1,5 +1,5 @@
-from tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-from description import Description
+from .tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
+from .description import Description
 from math import sqrt, cos, radians
 
 # Global debug, this is set when initializing CrossSection
@@ -80,7 +80,7 @@ class RatingCurve(object):
         return next(geo_file)
 
     def __str__(self):
-        return 'XS Rating Curve= ' + str(self.value1) + ' ,' + str(self.value2) + '\n' 
+        return 'XS Rating Curve= ' + str(self.value1) + ' ,' + str(self.value2) + '\n'
 
 
 class Skew(object):
@@ -136,8 +136,8 @@ class Header(object):
         self.rob_length = vals[4]
 
         if DEBUG:
-            print '-'*30
-            print 'Importing XS:', self.xs_id
+            print('-'*30)
+            print('Importing XS:', self.xs_id)
 
         return next(geo_file)
 
@@ -211,7 +211,7 @@ class StationElevation(object):
             if pt[0] == sta:
                 return pt[1]
         raise AttributeError('No station matching ' + str(sta) + ' in current XS.')
-        
+
 
     def import_geo(self, line, geo_file):
         """
@@ -228,7 +228,7 @@ class StationElevation(object):
                 self.points.append((vals[i], vals[i + 1]))
             line = next(geo_file)
         if DEBUG:
-            print 'len(self.points)=', len(self.points), 'self.num_pts=', self.num_pts
+            print('len(self.points)=', len(self.points), 'self.num_pts=', self.num_pts)
             # print self.points
         assert len(self.points) == self.num_pts
         return line
@@ -249,7 +249,7 @@ class IEFA(object):
         self.type = None
         self.iefa_list = []
         self.iefa_permanence = []
-                    
+
     @staticmethod
     def test(line):
         if line[:10] == '#XS Ineff=':
@@ -269,7 +269,7 @@ class IEFA(object):
                 self.iefa_list.append((values[i], values[i + 1], values[i + 2]))
             line = next(geo_file)
         assert self.num_iefa == len(self.iefa_list)
-        
+
         # Process IEFA permanence
         if line != 'Permanent Ineff=\n':
             raise ValueError('Permanent Ineff= does not follow IEFA in geometry file. Aborting.')
@@ -298,7 +298,7 @@ class IEFA(object):
                 s += '       T'
             else:
                 s += '       F'
-        s += '\n'            
+        s += '\n'
         return s
 
 
@@ -507,8 +507,8 @@ class CrossSection(object):
         return line
 
     def cut_line_ratio(self):
-        """ 
-        Returns ratio of xs geometry length to cutline length. 
+        """
+        Returns ratio of xs geometry length to cutline length.
         Raises AttributeError if either are empty
         """
         # TODO - correct for skew!
@@ -519,9 +519,9 @@ class CrossSection(object):
             raise AttributeError('Cross section does not have a geometry')
 
         length = self.sta_elev.points[-1][0] - self.sta_elev.points[0][0]
-        # the line below should work, but needs to be tested 
+        # the line below should work, but needs to be tested
         #length = length/cos(radians(self.skew.angle))
-        
+
         # Add up length of all segments of the cutline
         cl_length = 0.0
         last_pt = self.cutline.points[0]
