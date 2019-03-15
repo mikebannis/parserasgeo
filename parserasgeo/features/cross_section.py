@@ -95,6 +95,7 @@ class Skew(object):
 class Header(object):
     def __init__(self):
         self.xs_id = None
+        self.xs_id_str = None
         self.node_type = None
         self.lob_length = None
         self.channel_length = None
@@ -110,6 +111,9 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
         assert len(fields) == 5
+
+        self.xs_id_str = fields[1]
+
         vals = [fl_int(x) for x in fields]
         # Node type and cross section id
         self.node_type = vals[0]
@@ -131,7 +135,7 @@ class Header(object):
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
-        s += '{:<8}'.format(str(self.xs_id)) + ','
+        s += str(self.xs_id_str) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
         return s
 
