@@ -18,6 +18,9 @@ import os.path
 class CrossSectionNotFound(Exception):
     pass
 
+class CulvertNotFound(Exception):
+    pass
+
 class ParseRASGeo(object):
     def __init__(self, geo_filename, chatty=False, debug=False):
         # add  test for file existence
@@ -150,6 +153,46 @@ class ParseRASGeo(object):
                 if test_xs_id == wanted_xs_id and test_river == wanted_river and test_reach == wanted_reach:
                     return item
         raise CrossSectionNotFound
+        
+    def return_culvert(self, culvert_id, river, reach, strip=False, rnd=False, digits=0):
+        """
+        returns matching Culvert if it is in self.geo_list. raises CulvertNotFound otherwise
+        :param culvert_id: culvert id number
+        :param river: name of river
+        :param reach: name of reach
+        :param strip: strips whitespace off river and reach if true
+        :return: Culvert object
+        """
+        wanted_river = river
+        wanted_reach = reach
+        wanted_culvert_id = culvert_id
+
+        if strip:
+            if type(river) is not str and type(river) is not unicode:
+                raise AttributeError('For culvert '+str(culvert_id)+' "river" is not a string, got:'+str(river)+' instead.')
+            if type(reach) is not str and type(reach) is not unicode:
+                raise AttributeError('For culvert '+str(culvert_id)+' "reach" is not a string, got:'+str(reach)+' instead.')
+            wanted_river = river.strip()
+            wanted_reach = reach.strip()
+        if rnd:
+            wanted_culvert_id = round(culvert_id, digits)
+
+        for item in self.geo_list:
+            if isinstance(item, Culvert):
+                test_river = item.river
+                test_reach = item.reach
+                test_culvert_id = item.header.station
+
+                if strip:
+                    test_river = test_river.strip()
+                    test_reach = test_reach.strip()
+                if rnd:
+                    test_culvert_id = round(test_culvert_id, digits)
+
+                # Rounding and strip is done, see if this is the right XS
+                if test_culvert_id == wanted_culvert_id and test_river == wanted_river and test_reach == wanted_reach:
+                    return item
+        raise CulvertNotFound
 
     def extract_xs(self):
         """
@@ -187,7 +230,7 @@ class ParseRASGeo(object):
         :param geo_list: from import_ras_geo
         :return: True if duplicate
         """
-        xs_list = extract_xs(self.geo_list)
+        xs_list = self.extract_xs(self.geo_list)
         count = 0
         for xs in xs_list:
             if xs.xs_id == xs_id:
