@@ -117,102 +117,40 @@ class ParseRASGeo(object):
     def return_xs(self, xs_id, river, reach, strip=False, rnd=False, digits=0):
         """
         returns matching CrossSection if it is in self.geo_list. raises CrossSectionNotFound otherwise
+        
         :param xs_id: cross section id number
         :param river: name of river
         :param reach: name of reach
         :param strip: strips whitespace off river and reach if true
         :return: CrossSection object
+        "raises CrossSectionNotFound: raises error if xs is not in the geometry file
         """
-        wanted_river = river
-        wanted_reach = reach
-        wanted_xs_id = xs_id
-
-        if strip:
-            if type(river) is not str and type(river) is not unicode:
-                raise AttributeError('For XS '+str(xs_id)+' "river" is not a string, got:'+str(river)+' instead.')
-            if type(reach) is not str and type(reach) is not unicode:
-                raise AttributeError('For XS '+str(xs_id)+' "reach" is not a string, got:'+str(reach)+' instead.')
-            wanted_river = river.strip()
-            wanted_reach = reach.strip()
-        if rnd:
-            wanted_xs_id = round(xs_id, digits)
-
-        for item in self.geo_list:
-            if isinstance(item, CrossSection):
-                test_river = item.river
-                test_reach = item.reach
-                test_xs_id = item.header.xs_id
-
-                if strip:
-                    test_river = test_river.strip()
-                    test_reach = test_reach.strip()
-                if rnd:
-                    test_xs_id = round(test_xs_id, digits)
-
-                # Rounding and strip is done, see if this is the right XS
-                if test_xs_id == wanted_xs_id and test_river == wanted_river and test_reach == wanted_reach:
-                    return item
-        raise CrossSectionNotFound
+        return self._return_node(self, CrossSection, xs_id, river, reach, strip, rnd, digits)
         
     def return_culvert(self, culvert_id, river, reach, strip=False, rnd=False, digits=0):
         """
         returns matching Culvert if it is in self.geo_list. raises CulvertNotFound otherwise
+        
         :param culvert_id: culvert id number
         :param river: name of river
         :param reach: name of reach
         :param strip: strips whitespace off river and reach if true
         :return: Culvert object
+        :raises CulvertNotFound: raises error if culvert is not in the geometry file
         """
-        wanted_river = river
-        wanted_reach = reach
-        wanted_culvert_id = culvert_id
-
-        if strip:
-            if type(river) is not str and type(river) is not unicode:
-                raise AttributeError('For culvert '+str(culvert_id)+' "river" is not a string, got:'+str(river)+' instead.')
-            if type(reach) is not str and type(reach) is not unicode:
-                raise AttributeError('For culvert '+str(culvert_id)+' "reach" is not a string, got:'+str(reach)+' instead.')
-            wanted_river = river.strip()
-            wanted_reach = reach.strip()
-        if rnd:
-            wanted_culvert_id = round(culvert_id, digits)
-
-        for item in self.geo_list:
-            if isinstance(item, Culvert):
-                test_river = item.river
-                test_reach = item.reach
-                test_culvert_id = item.header.station
-
-                if strip:
-                    test_river = test_river.strip()
-                    test_reach = test_reach.strip()
-                if rnd:
-                    test_culvert_id = round(test_culvert_id, digits)
-
-                # Rounding and strip is done, see if this is the right XS
-                if test_culvert_id == wanted_culvert_id and test_river == wanted_river and test_reach == wanted_reach:
-                    return item
-        raise CulvertNotFound
+        return self._return_node(self, Culvert, culvert_id, river, reach, strip, rnd, digits)
 
     def extract_xs(self):
         """
         Returns list of all cross sections in geometry
         """
-        new_geo_list = []
-        for item in self.geo_list:
-            if isinstance(item, CrossSection):
-                new_geo_list.append(item)
-        return new_geo_list
+        return self._extract_node(CrossSection)
 
     def extract_culverts(self):
         """
         Returns list of all culverts in geometry
         """
-        new_geo_list = []
-        for item in self.geo_list:
-            if isinstance(item, Culvert):
-                new_geo_list.append(item)
-        return new_geo_list
+        return self._extract_node(Culvert)
 
     def number_xs(self):
         """
@@ -241,6 +179,81 @@ class ParseRASGeo(object):
             return False
         else:
             raise CrossSectionNotFound
+    
+    def _return_node(self, node_type, node_id, river, reach, strip=False, rnd=False, digits=0):
+        """
+        This semi-private method is written in a general format.
+        It is meant to be called by more user friendly methods, such as
+        return_xs or return_culvert
+        
+        returns matching node if it is in self.geo_list. raises <Node>NotFound otherwise where
+        <Node> is a type of node
+        
+        :param node_type: the type of node to be returned
+        :param culvert_id: culvert id number
+        :param river: name of river
+        :param reach: name of reach
+        :param strip: strips whitespace off river and reach if true
+        :return: Culvert object
+        :raises NodeNotFound: raises error if the node is not found in the geometry file
+        """
+        wanted_river = river
+        wanted_reach = reach
+        wanted_node_id = node_id
+        
+        if isinstance(node_type, CrossSection):
+            node_name = 'XS'
+            NodeNotFound = CrossSectionNotFound
+        if isinstance(node_type, Culvert):
+            node_name = 'culvert'
+            NodeNotFound = CulvertNotFound
+
+        if strip:
+            if type(river) is not str and type(river) is not unicode:
+                raise AttributeError('For {} "river" is not a string, got: {} instead.'.format(node_name, river))
+            if type(reach) is not str and type(reach) is not unicode:
+                raise AttributeError('For {} "reach" is not a string, got: {} instead.'.format(node_name, reach))
+            wanted_river = river.strip()
+            wanted_reach = reach.strip()
+        if rnd:
+            wanted_node_id = round(node_id, digits)
+
+        for item in self.geo_list:
+            if isinstance(item, Culvert):
+                test_river = item.river
+                test_reach = item.reach
+                
+                # TODO: get rid of if-else statements after changing xs_id to station in cross_section.py
+                if isinstance(node_type, CrossSection):
+                    test_node_id = item.header.xs_id
+                else:
+                    test_node_id = item.header.station
+
+                if strip:
+                    test_river = test_river.strip()
+                    test_reach = test_reach.strip()
+                if rnd:
+                    test_node_id = round(test_node_id, digits)
+
+                # Rounding and strip is done, see if this is the right XS
+                if test_node_id == wanted_node_id and test_river == wanted_river and test_reach == wanted_reach:
+                    return item
+        raise NodeNotFound 
+            
+    def _extract_node(self, node_type):
+        """
+        This semi-private method is written in a general format.
+        It is meant to be called by more user friendly methods, such as
+        extract_xs or extract_culvert
+        
+        :param node_type: the type of node to be returned
+        :return: a list of all nodes of type <node_type> in geometry
+        """
+        new_geo_list = []
+        for item in self.geo_list:
+            if isinstance(item, node_type):
+                new_geo_list.append(item)
+        return new_geo_list
 
 
 def main():
