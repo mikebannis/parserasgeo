@@ -572,6 +572,27 @@ class CrossSection(object):
             self.channel_n = new_channel_n
         else:
             raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_channel_n')
+            
+    def alter_overbank_n(self, scalar):
+        """
+        Alters the overbank n-values by a scaling factor.
+        
+        :param scalar: a number by which the channel n values are scaled
+        :raises ChannelNError: raises error if channel_n not defined
+        """
+        
+        if self.channel_n is None:
+            raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_nonchannel_n')
+        
+        channel_n_stations = [x[0] for x in self.channel_n]
+        for ind, old_n in enumerate(self.mannings_n.values):
+            if old_n[0] in channel_n_stations:
+                pass
+            else:
+                temp_n = old_n[1]*scalar
+                temp_tuple = (old_n[0], temp_n, 0)
+                self.mannings_n.values.pop(ind)
+                self.mannings_n.values.insert(ind, temp_tuple)
 
     def __str__(self):
         s = ''
