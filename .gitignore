@@ -17,3 +17,4 @@ test.out
 *uselesschange
 build/
 dist/
+test/notebooks

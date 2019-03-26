@@ -582,7 +582,7 @@ class CrossSection(object):
         """
         
         if self.channel_n is None:
-            raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_nonchannel_n')
+            raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_overbank_n')
         
         channel_n_stations = [x[0] for x in self.channel_n]
         for ind, old_n in enumerate(self.mannings_n.values):
