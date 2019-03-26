@@ -107,6 +107,7 @@ class Skew(object):
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
+        # TODO: change xs_id to station
         self.xs_id = None
         self.node_type = None
         self.lob_length = None
