@@ -5,14 +5,6 @@ from math import sqrt, cos, radians
 # Global debug, this is set when initializing CrossSection
 DEBUG = False
 
-class BankStationError(Exception):
-    """
-    An error if the bank stations are not correct
-    
-    e.g. left bank station > right bank station, right bank station > last station
-    """
-    pass
-
 class ChannelNError(Exception):
     """
     An error to raise if the user attempts to change channel n values without first defining the channel
@@ -580,30 +572,6 @@ class CrossSection(object):
             self.channel_n = new_channel_n
         else:
             raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_channel_n')
-
-    def bank_station_change(self, constant):
-        """
-        Move the bank stations by constant [ft] if the user deems the original model to not be accurate
-        If constant > 0, the stations move outward
-        If cosntant < 0, the stations move inward
-        
-        :param constant: constant by which the stations are moved
-        :returns: None
-        :raises BankStationError: riases error if moving the bank statiosn crates impossible situations (e.g. left bank > right bank)
-        """
-        
-        self.bank_sta.left -= constant
-        self.bank_sta.right += constant
-        
-        if self.bank_sta.left >= self.bank_sta.right:
-            raise BankStationError('left bank >= right bank for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
-        
-        if self.bank_sta.left < 0:
-            raise BankStationError('left bank < 0 for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
-        
-        if self.bank_sta.right > self.sta_elev.points[-1][0]:
-            raise BankStationError('right bank > last station for ({}, {}, {})'.format(self.header.station_id, self.river, self.reach))
-
 
     def __str__(self):
         s = ''
