@@ -573,9 +573,9 @@ class CrossSection(object):
         else:
             raise ChannelNError('The channel is undefined. Run define_channel_n before using alter_channel_n')
             
-    def alter_nonchannel_n(self, scalar):
+    def alter_overbank_n(self, scalar):
         """
-        Alters the non-channel n-values by a scaling factor.
+        Alters the overbank n-values by a scaling factor.
         
         :param scalar: a number by which the channel n values are scaled
         :raises ChannelNError: raises error if channel_n not defined
