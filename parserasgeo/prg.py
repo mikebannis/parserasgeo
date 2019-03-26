@@ -219,7 +219,7 @@ class ParseRASGeo(object):
             wanted_node_id = round(node_id, digits)
 
         for item in self.geo_list:
-            if isinstance(item, Culvert):
+            if isinstance(item, node_type):
                 test_river = item.river
                 test_reach = item.reach
                 
