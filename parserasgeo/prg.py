@@ -125,7 +125,7 @@ class ParseRASGeo(object):
         :return: CrossSection object
         "raises CrossSectionNotFound: raises error if xs is not in the geometry file
         """
-        return self._return_node(self, CrossSection, xs_id, river, reach, strip, rnd, digits)
+        return self._return_node(CrossSection, xs_id, river, reach, strip, rnd, digits)
         
     def return_culvert(self, culvert_id, river, reach, strip=False, rnd=False, digits=0):
         """
@@ -138,19 +138,19 @@ class ParseRASGeo(object):
         :return: Culvert object
         :raises CulvertNotFound: raises error if culvert is not in the geometry file
         """
-        return self._return_node(self, Culvert, culvert_id, river, reach, strip, rnd, digits)
+        return self._return_node(Culvert, culvert_id, river, reach, strip, rnd, digits)
 
-    def extract_xs(self):
+    def extract_all_xs(self):
         """
         Returns list of all cross sections in geometry
         """
-        return self._extract_node(CrossSection)
+        return self._extract_all_nodes(CrossSection)
 
-    def extract_culverts(self):
+    def extract_all_culverts(self):
         """
         Returns list of all culverts in geometry
         """
-        return self._extract_node(Culvert)
+        return self._extract_all_nodes(Culvert)
 
     def number_xs(self):
         """
@@ -201,13 +201,13 @@ class ParseRASGeo(object):
         wanted_reach = reach
         wanted_node_id = node_id
         
-        if isinstance(node_type, CrossSection):
+        if node_type.__name__ is 'CrossSection':
             node_name = 'XS'
             NodeNotFound = CrossSectionNotFound
-        if isinstance(node_type, Culvert):
+        if node_type.__name__ is 'Culvert':
             node_name = 'culvert'
             NodeNotFound = CulvertNotFound
-
+        
         if strip:
             if type(river) is not str and type(river) is not unicode:
                 raise AttributeError('For {} "river" is not a string, got: {} instead.'.format(node_name, river))
@@ -224,7 +224,7 @@ class ParseRASGeo(object):
                 test_reach = item.reach
                 
                 # TODO: get rid of if-else statements after changing xs_id to station in cross_section.py
-                if isinstance(node_type, CrossSection):
+                if node_type.__name__ is 'CrossSection':
                     test_node_id = item.header.xs_id
                 else:
                     test_node_id = item.header.station
@@ -240,7 +240,7 @@ class ParseRASGeo(object):
                     return item
         raise NodeNotFound 
             
-    def _extract_node(self, node_type):
+    def _extract_all_nodes(self, node_type):
         """
         This semi-private method is written in a general format.
         It is meant to be called by more user friendly methods, such as
@@ -257,53 +257,12 @@ class ParseRASGeo(object):
 
 
 def main():
-    outfile = '../test/test.out'
-    infile = '../geos/third/third_final.g01'
-    geo = ParseRASGeo(infile, chatty=True, debug=True)
+    infile = '../geos/3rd_test.g01'
+    geo = ParseRASGeo(infile)
 
-    if not True:
-        for item in geo.geo_list:
-            if type(item) is Culvert:
-                print('-'*50)
-                print('bridge/culvert', item.header.station)
-                print(str(item))
-
-    if not True:
-        for item in geo.geo_list:
-            if hasattr(item, 'description'):
-                if item.description is not []:
-                    print(type(item))
-                    print(item.description)
-
-    if not True:
-        count = 0
-        for item in geo.geo_list:
-            if type(item) is str:
-                count += 1
-                print('unknown: ', str(item),)
-        print(count, 'unknown lines')
-
-    if not True:
-        xs_list = geo.extract_xs()
-        for xs in xs_list:
-                print(str(xs.header.xs_id)+','+str(xs.rating_curve.value1))
-
-    if not True:
-        for item in geo.geo_list:
-            if type(item) is Junction:
-                print('Junction', item.header.name)
-
-    geo.write(outfile)
-
-    if True:
-        print('Comparing', infile, 'and', outfile)
-        import filecmp
-        import subprocess
-        if filecmp.cmp(infile, outfile, shallow=False):
-            print('Input and output files are identical')
-        else:
-            print('WARNING: files are different!!!')
-            subprocess.Popen(["diff", infile, outfile])
+    cross_sections = geo.extract_xs()
+    for xs in cross_sections:
+        print(xs)
 
 if __name__ == '__main__':
     main()
