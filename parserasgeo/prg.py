@@ -158,7 +158,8 @@ class ParseRASGeo(object):
         :param geo_list: list from import_ras_geo
         :return: number (int) of XS in geolist
         """
-        xs_list = self.extract_xs()
+        #xs_list = self.extract_xs()
+        xs_list = self.extract_all_xs()
         return len(xs_list)
 
     def is_xs_duplicate(self, xs_id):

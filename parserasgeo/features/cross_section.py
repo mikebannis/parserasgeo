@@ -116,7 +116,7 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
         assert len(fields) == 5
-        vals = [fl_int(x) for x in fields]
+        vals = [self._header_fl_int(x) for x in fields]
         # Node type and cross section id
         self.node_type = vals[0]
         # TODO - RAS allows Xs ids to be in the format '225.20', fl_int() strips trailing zeros
@@ -134,6 +134,19 @@ class Header(object):
 
         return next(geo_file)
 
+    ### TODO: Handle null reach lengths appropriately
+    @staticmethod
+    def _header_fl_int(x):
+        """ 
+        Reach lengths may be blank at the downstream end. This looks out for 
+        that scenario and returns 0. This will break the ability to reproduce 
+        some geometry file to the character and should be updated at some point!
+        """
+        if x == '' or x == '\n':
+            return 0
+        else:
+            return fl_int(x)
+        
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
