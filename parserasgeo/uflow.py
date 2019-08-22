@@ -131,7 +131,7 @@ class Header(object):
     def __init__(self):
         self.river_name = None
         self.reach_name = None
-        self.location = None
+        self.xs_id = None
 
     @staticmethod
     def test(line):
@@ -141,7 +141,7 @@ class Header(object):
         self._parts = line.split('=')[1].split(',')
         self.river_name = self._parts[0].strip()
         self.reach_name = self._parts[1].strip()
-        self.location = self._parts[2].strip()
+        self.xs_id = fl_int(self._parts[2])
         return infile.readline()
 
     def __str__(self):

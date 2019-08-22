@@ -76,8 +76,8 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[12:].split(',')
         assert len(fields) == 2
-        self.river_name = fields[0]
-        self.reach_name = fields[1][:-1]
+        self.river_name = fields[0].strip()
+        self.reach_name = fields[1][:-1].strip()
         if DEBUG:
             print('*'*50)
             print('Imported river/reach:', self.river_name, '/', self.reach_name)
