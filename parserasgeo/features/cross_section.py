@@ -1,5 +1,6 @@
 from .tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 from .description import Description
+from .station import Station
 from math import sqrt, cos, radians
 
 # Global debug, this is set when initializing CrossSection
@@ -99,8 +100,7 @@ class Skew(object):
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
-        self.xs_station_id = None
-        self.xs_station_value = None
+        self.station = None
         self.node_type = None
         self.lob_length = None
         self.channel_length = None
@@ -118,23 +118,16 @@ class Header(object):
         assert len(fields) == 5
 
         self.node_type = int(fields[0])
-        self.xs_station_id = fields[1].strip()
-        self.xs_station_value = self._station_value_from_id(self.xs_station_id)
+        self.station = Station(fields[1])
         self.lob_length = self._to_float(fields[2])
         self.channel_length = self._to_float(fields[3])
         self.rob_length = self._to_float(fields[4])
 
         if DEBUG:
             print('-'*30)
-            print('Importing XS:', self.xs_station_id)
+            print('Importing XS:', self.station.id)
 
         return next(geo_file)
-
-    @staticmethod
-    def _station_value_from_id(xs_station_id):
-        if xs_station_id.endswith("*"):
-            xs_station_id = xs_station_id[:-1]
-        return float(xs_station_id)
 
     ### TODO: Handle null reach lengths appropriately
     @staticmethod
@@ -151,7 +144,7 @@ class Header(object):
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
-        s += '{:<8}'.format(self.xs_station_id) + ','
+        s += str(self.station) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
         return s
 
@@ -510,7 +503,6 @@ class CrossSection(object):
             else:  # Unknown line, add as text
                 self.geo_list.append(line)
                 line = next(geo_file)
-        self.is_interpolated = self.header.xs_station_id.endswith("*")
         return line
 
     def cut_line_ratio(self):

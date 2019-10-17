@@ -11,7 +11,9 @@ mike.bannister@respec.com
 import os.path
 import warnings
 
-from .features import Bridge, CrossSection, Culvert, Junction, LateralWeir, RiverReach
+from .features import (
+    Bridge, CrossSection, Culvert, Junction, InlineWeir, LateralWeir, RiverReach
+)
 
 
 # TODO - create geolist object
@@ -32,6 +34,7 @@ class ParseRASGeo(object):
         num_bridge = 0
         num_culvert = 0
         num_lat_weir = 0
+        num_inline_weir = 0
         num_junc = 0
         num_unknown = 0
         river = None
@@ -75,6 +78,11 @@ class ParseRASGeo(object):
                     lat_weir.import_geo(line, geo_file)
                     num_lat_weir += 1
                     self.geo_list.append(lat_weir)
+                elif InlineWeir.test(line):
+                    lat_weir = InlineWeir(river, reach)
+                    lat_weir.import_geo(line, geo_file)
+                    num_inline_weir += 1
+                    self.geo_list.append(lat_weir)
                 elif Junction.test(line):
                     junc = Junction()
                     junc.import_geo(line, geo_file)
@@ -91,6 +99,7 @@ class ParseRASGeo(object):
             print(str(num_bridge)+' bridge imported')
             print(str(num_culvert)+' culverts imported')
             print(str(num_lat_weir)+' lateral structures imported')
+            print(str(num_inline_weir)+' lateral structures imported')
             print(str(num_unknown) + ' unknown lines imported')
 
     def write(self, out_geo_filename):
@@ -100,15 +109,15 @@ class ParseRASGeo(object):
 
     def get_cross_sections(
             self,
-            xs_station_value=None,
-            xs_station_id=None,
+            station_value=None,
+            station_id=None,
             river=None,
             reach=None,
             interpolated=None,
         ):
         """Get a list of matching CrossSection
-        :param xs_station_value: Optional float representing the location of the station or 2-tuple representing a range
-        :param xs_station_id: Optional string representing the CrossSection station as text
+        :param station_value: Optional float representing the location of the station or 2-tuple representing a range
+        :param station_id: Optional string representing the CrossSection station as text
         :param river: Optional string of the name of river
         :param reach: Optional string of the name of reach
         :param interpolated: Optional bool to select based on if the CrossSection was interpolated
@@ -116,27 +125,27 @@ class ParseRASGeo(object):
         """
         # Linear Search is the most efficient strategy at the moment
         cross_sections = (item for item in self.geo_list if isinstance(item, CrossSection))
-        if xs_station_id is not None:
+        if station_id is not None:
             cross_sections = (
-                xs for xs in cross_sections if xs.header.xs_station_id == xs_station_id
+                xs for xs in cross_sections if xs.header.station.id == station_id
             )
-        if xs_station_value is not None:
-            if isinstance(xs_station_value, tuple):
-                assert len(xs_station_value) == 2
-                if xs_station_value[0] is not None:
+        if station_value is not None:
+            if isinstance(station_value, tuple):
+                assert len(station_value) == 2
+                if station_value[0] is not None:
                     cross_sections = (
                         xs for xs in cross_sections
-                        if xs.header.xs_station_value >= xs_station_value[0]
+                        if xs.header.station.value >= station_value[0]
                     )
-                if xs_station_value[1] is not None:
+                if station_value[1] is not None:
                     cross_sections = (
                         xs for xs in cross_sections
-                        if xs.header.xs_station_value <= xs_station_value[1]
+                        if xs.header.station.value <= station_value[1]
                     )
             else:
                 cross_sections = (
                     xs for xs in cross_sections
-                    if xs.header.xs_station_value == xs_station_value
+                    if xs.header.station.value == station_value
                 )
         if river is not None:
             cross_sections = (xs for xs in cross_sections if xs.river == river)
@@ -144,7 +153,8 @@ class ParseRASGeo(object):
             cross_sections = (xs for xs in cross_sections if xs.reach == reach)
         if interpolated is not None:
             cross_sections = (
-                xs for xs in cross_sections if xs.is_interpolated == bool(interpolated)
+                xs for xs in cross_sections
+                if xs.header.station.is_interpolated == bool(interpolated)
             )
 
         return list(cross_sections)
@@ -164,10 +174,10 @@ class ParseRASGeo(object):
         for item in self.geo_list:
             if isinstance(item, CrossSection):
                 if rnd:
-                    if round(item.header.xs_station_value, digits) == round(xs_id, digits):
+                    if round(item.header.station.value, digits) == round(xs_id, digits):
                         return item
                 else:
-                    if item.header.xs_station_value == xs_id:
+                    if item.header.station.value == xs_id:
                         return item
         raise CrossSectionNotFound
 
@@ -261,6 +271,12 @@ class ParseRASGeo(object):
         """
         return [item for item in self.geo_list if isinstance(item, LateralWeir)]
 
+    def get_inline_weirs(self):
+        """
+        Returns list of all InlineWeir instances in geometry
+        """
+        return [item for item in self.geo_list if isinstance(item, InlineWeir)]
+
     def get_reaches(self, river=None, reach=None):
         """
         Returns list of all RiverReach in geometry
@@ -320,7 +336,7 @@ class ParseRASGeo(object):
                 
                 # TODO: get rid of if-else statements after changing xs_id to station in cross_section.py
                 if node_type.__name__ is 'CrossSection':
-                    test_node_id = item.header.xs_station_value
+                    test_node_id = item.header.station.value
                 else:
                     test_node_id = item.header.station
 

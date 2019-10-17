@@ -1,27 +1,9 @@
 # Boundary handling Copyright (C) KISTERS Nederland B.V.
 
-from .features.tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
-#from description import Description
-
-
-class Row(object):
-    """
-    This is a template for other features.
-    """
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def test(line):
-        if line.split('=')[0] == 'XS GIS Cut Line':
-            return True
-        return False
-
-    def import_geo(self, line, geo_file):
-        return line
-
-    def __str__(self):
-        pass
+from .features.tools import (
+    fl_int, pad_left, print_list_by_group, split_block_obs, split_by_n, split_by_n_str
+)
+from .station import Station
 
 
 class UnsteadyFlow(object):
@@ -131,8 +113,7 @@ class Header(object):
     def __init__(self):
         self.river_name = None
         self.reach_name = None
-        self.xs_station_value = None
-        self.xs_station_id = None
+        self.station = None
 
     @staticmethod
     def test(line):
@@ -142,8 +123,7 @@ class Header(object):
         self._parts = line.split('=')[1].split(',')
         self.river_name = self._parts[0].strip()
         self.reach_name = self._parts[1].strip()
-        self.xs_station_value = float(self._parts[2])
-        self.xs_station_id = self._parts[2].strip()
+        self.station = Station(self._parts[2])
         return infile.readline()
 
     def __str__(self):
