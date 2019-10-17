@@ -99,8 +99,8 @@ class Skew(object):
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
-        # TODO: change xs_id to station
-        self.xs_id = None
+        self.xs_station_id = None
+        self.xs_station_value = None
         self.node_type = None
         self.lob_length = None
         self.channel_length = None
@@ -116,41 +116,42 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
         assert len(fields) == 5
-        vals = [self._header_fl_int(x) for x in fields]
-        # Node type and cross section id
-        self.node_type = vals[0]
-        # TODO - RAS allows Xs ids to be in the format '225.20', fl_int() strips trailing zeros
-        # This should be fixed at some point, but may break compatibility with other things
-        # like the FHAD tools, and probably things within prg
-        self.xs_id = vals[1]
-        # Reach lengths
-        self.lob_length = vals[2]
-        self.channel_length = vals[3]
-        self.rob_length = vals[4]
+
+        self.node_type = int(fields[0])
+        self.xs_station_id = fields[1].strip()
+        self.xs_station_value = self._station_value_from_id(self.xs_station_id)
+        self.lob_length = self._to_float(fields[2])
+        self.channel_length = self._to_float(fields[3])
+        self.rob_length = self._to_float(fields[4])
 
         if DEBUG:
             print('-'*30)
-            print('Importing XS:', self.xs_id)
+            print('Importing XS:', self.xs_station_id)
 
         return next(geo_file)
 
+    @staticmethod
+    def _station_value_from_id(xs_station_id):
+        if xs_station_id.endswith("*"):
+            xs_station_id = xs_station_id[:-1]
+        return float(xs_station_id)
+
     ### TODO: Handle null reach lengths appropriately
     @staticmethod
-    def _header_fl_int(x):
+    def _to_float(x):
         """ 
         Reach lengths may be blank at the downstream end. This looks out for 
         that scenario and returns 0. This will break the ability to reproduce 
         some geometry file to the character and should be updated at some point!
         """
         if x == '' or x == '\n':
-            return 0
-        else:
-            return fl_int(x)
+            return 0.0
+        return float(x)
         
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
-        s += '{:<8}'.format(str(self.xs_id)) + ','
+        s += '{:<8}'.format(self.xs_station_id) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
         return s
 
@@ -497,6 +498,7 @@ class CrossSection(object):
         # used to define n-values in the channel only (i.e. between the bank stations)
         # gets defined in define_channel_n
         self.channel_n = None
+        self.is_interpolated = None
         
     def import_geo(self, line, geo_file):
         while line != '\n':
@@ -510,6 +512,7 @@ class CrossSection(object):
             else:  # Unknown line, add as text
                 self.geo_list.append(line)
                 line = next(geo_file)
+        self.is_interpolated = self.header.xs_station_id.endswith("*")
         return line
 
     def cut_line_ratio(self):

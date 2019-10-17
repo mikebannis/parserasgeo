@@ -27,9 +27,8 @@ Open a model, increase all Manning's n values by 50%, and save the geometry as a
 import parserasgeo as prg
 
 geo = prg.ParseRASGeo('my_model.g01')
-cross_sections = geo.extract_xs()
 
-for xs in cross_sections:
+for xs in geo.get_cross_sections():
 	n_vals = xs.mannings_n.values 
 	
 	# n-values are stored as a list of 3-tuples
@@ -45,9 +44,3 @@ geo.write('my_model.g02')
 While currently functional, this is very much a work in progress. Well written and tested pull requests are gladly accepted.
 
 One of the goals for this library is that exported geometries will match original geometries to the character. This allows easy testing of new functionality by comparing the original geometry file to one exported from parserasgeo (assuming no changes were made).
-
-## Known Issues
-
-HEC-RAS allows cross section ids with trailing zeros, e.g. 225.0, 123.40. Parserasgeo currently treats all XS ids as floats or ints, thereby discarding trailing zeros. While this should be easy to fix, it may break compatibility with other software I use, and will be updated at some point in the future.
-
-
