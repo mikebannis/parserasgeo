@@ -261,11 +261,19 @@ class ParseRASGeo(object):
         """
         return [item for item in self.geo_list if isinstance(item, LateralWeir)]
 
-    def get_reaches(self):
+    def get_reaches(self, river=None, reach=None):
         """
         Returns list of all RiverReach in geometry
+        :param river: Optional string of the name of river
+        :param reach: Optional string of the name of reach
         """
-        return [item for item in self.geo_list if isinstance(item, RiverReach)]
+        reaches = (item for item in self.geo_list if isinstance(item, RiverReach))
+        if river is not None:
+            reaches = (r for r in reaches if r.header.river_name == river)
+        if reach is not None:
+            reaches = (r for r in reaches if r.header.reach_name == reach)
+
+        return list(reaches)
 
     def _return_node(self, node_type, node_id, river, reach, strip=False, rnd=False, digits=0):
         """
