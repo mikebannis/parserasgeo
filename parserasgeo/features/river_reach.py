@@ -90,7 +90,6 @@ class Header(object):
 
 class Geo(object):
     def __init__(self):
-        self.num_points = None  # int
         self.points = []  # [(x1, y1), (x2, y2), ... ] all values are strings so that the exported file is identical
 
     @staticmethod
@@ -100,18 +99,18 @@ class Geo(object):
         return False
 
     def import_geo(self, line, geo_file):
-        self.num_points = int(line[9:].strip())
+        _num_points = int(line[9:].strip())
         line = next(geo_file)
         while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-':
             vals = split_by_n_str(line, 16)
             for i in range(0, len(vals), 2):
                 self.points.append((vals[i], vals[i + 1]))
             line = next(geo_file)
-        assert self.num_points == len(self.points)
+        assert len(self.points) == _num_points
         return line
 
     def __str__(self):
-        s = 'Reach XY= ' + str(self.num_points) + ' \n'
+        s = 'Reach XY= ' + str(len(self.points)) + ' \n'
         pts = [self.points[i:i + 2] for i in range(0, len(self.points), 2)]
         for pt in pts:
             if len(pt) == 2:

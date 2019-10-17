@@ -197,7 +197,6 @@ class LastEdit(object):
 
 class StationElevation(object):
     def __init__(self):
-        self.num_pts = None
         self.points = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
 
     @staticmethod
@@ -227,7 +226,7 @@ class StationElevation(object):
         :param geo_file: geometry file object
         :return: line in geo_file after sta/elev data
         """
-        self.num_pts = int(line[10:])
+        num_pts = int(line[10:])
         line = next(geo_file)
         while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
             vals = split_by_n(line, 8)
@@ -235,13 +234,12 @@ class StationElevation(object):
                 self.points.append((vals[i], vals[i + 1]))
             line = next(geo_file)
         if DEBUG:
-            print('len(self.points)=', len(self.points), 'self.num_pts=', self.num_pts)
-            # print self.points
-        assert len(self.points) == self.num_pts
+            print('len(self.points)=', len(self.points), 'num_pts=', num_pts)
+        assert len(self.points) == num_pts
         return line
 
     def __str__(self):
-        s = '#Sta/Elev= ' + str(self.num_pts) + ' \n'
+        s = '#Sta/Elev= ' + str(len(self.points)) + ' \n'
         # unpack tuples
         sta_elev_list = [x for tup in self.points for x in tup]
         # convert to padded columns of 8
