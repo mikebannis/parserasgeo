@@ -94,7 +94,7 @@ class ParseRASGeo(object):
             print(str(num_unknown) + ' unknown lines imported')
 
     def write(self, out_geo_filename):
-        with open(out_geo_filename, 'wt') as outfile:
+        with open(out_geo_filename, 'wt', newline='\r\n') as outfile:
             for line in self.geo_list:
                 outfile.write(str(line))
 
