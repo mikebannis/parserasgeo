@@ -3,7 +3,7 @@
 from .features.tools import (
     fl_int, pad_left, print_list_by_group, split_block_obs, split_by_n, split_by_n_str
 )
-from .station import Station
+from .features.station import Station
 
 
 class UnsteadyFlow(object):
