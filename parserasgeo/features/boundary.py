@@ -21,16 +21,14 @@ class Boundary(Feature):
         return Header.test(line)
 
     def import_geo(self, line, infile):
-        while line:
-            for part in self.parts:
-                if part.test(line):
-                    line = part.import_geo(line, infile)
-                    self.parts.remove(part)
-                    self.uflow_list.append(part)
-                    break
-            else:  # Unknown line, add as text
-                self.uflow_list.append(line)
-                line = infile.readline()
+        while True:
+            part = next((p for p in self.parts if p.test(line)), None)
+            if part is not None:
+                line = part.import_geo(line, infile)
+                self.parts.remove(part)
+                self.uflow_list.append(part)
+            else:
+                break
         return line
 
     def __str__(self):
@@ -102,6 +100,7 @@ class Hydrograph(Feature):
             self.values.extend(vals)
             line = infile.readline()
         assert len(self.values) == num_pts
+        return line
 
     def __str__(self):
         s = "Hydrograph=" + print_list_by_group(self.values, 8, 10)
