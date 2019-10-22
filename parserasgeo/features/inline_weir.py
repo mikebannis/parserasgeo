@@ -49,6 +49,7 @@ class InlineWeir(Feature):
             else:
                 self.geo_list.append(line)
                 line = next(geo_file)
+        return line
 
     def __str__(self):
         s = "".join(map(str, self.geo_list))
