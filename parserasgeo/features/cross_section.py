@@ -1,5 +1,6 @@
 from .tools import fl_int, split_by_n_str, pad_left, print_list_by_group, split_block_obs, split_by_n
 from .description import Description
+from .station import Station
 from math import sqrt, cos, radians
 
 # Global debug, this is set when initializing CrossSection
@@ -99,8 +100,7 @@ class Skew(object):
 # TODO: possibly move header into CrossSection
 class Header(object):
     def __init__(self):
-        # TODO: change xs_id to station
-        self.xs_id = None
+        self.station = None
         self.node_type = None
         self.lob_length = None
         self.channel_length = None
@@ -116,41 +116,35 @@ class Header(object):
     def import_geo(self, line, geo_file):
         fields = line[23:].split(',')
         assert len(fields) == 5
-        vals = [self._header_fl_int(x) for x in fields]
-        # Node type and cross section id
-        self.node_type = vals[0]
-        # TODO - RAS allows Xs ids to be in the format '225.20', fl_int() strips trailing zeros
-        # This should be fixed at some point, but may break compatibility with other things
-        # like the FHAD tools, and probably things within prg
-        self.xs_id = vals[1]
-        # Reach lengths
-        self.lob_length = vals[2]
-        self.channel_length = vals[3]
-        self.rob_length = vals[4]
+
+        self.node_type = int(fields[0])
+        self.station = Station(fields[1])
+        self.lob_length = self._to_float(fields[2])
+        self.channel_length = self._to_float(fields[3])
+        self.rob_length = self._to_float(fields[4])
 
         if DEBUG:
             print('-'*30)
-            print('Importing XS:', self.xs_id)
+            print('Importing XS:', self.station.id)
 
         return next(geo_file)
 
     ### TODO: Handle null reach lengths appropriately
     @staticmethod
-    def _header_fl_int(x):
+    def _to_float(x):
         """ 
         Reach lengths may be blank at the downstream end. This looks out for 
         that scenario and returns 0. This will break the ability to reproduce 
         some geometry file to the character and should be updated at some point!
         """
         if x == '' or x == '\n':
-            return 0
-        else:
-            return fl_int(x)
+            return 0.0
+        return float(x)
         
     def __str__(self):
         s = 'Type RM Length L Ch R = '
         s += str(self.node_type) + ' ,'
-        s += '{:<8}'.format(str(self.xs_id)) + ','
+        s += str(self.station) + ','
         s += str(self.lob_length) + ',' + str(self.channel_length) + ',' + str(self.rob_length) + '\n'
         return s
 
@@ -196,7 +190,6 @@ class LastEdit(object):
 
 class StationElevation(object):
     def __init__(self):
-        self.num_pts = None
         self.points = []  # [(sta0, elev0), (sta1, elev1), ... ] Values stored as float/int
 
     @staticmethod
@@ -226,7 +219,7 @@ class StationElevation(object):
         :param geo_file: geometry file object
         :return: line in geo_file after sta/elev data
         """
-        self.num_pts = int(line[10:])
+        num_pts = int(line[10:])
         line = next(geo_file)
         while line[:1] == ' ' or line[:1].isdigit() or line[:1] == '-' or line[:1] == '.':
             vals = split_by_n(line, 8)
@@ -234,13 +227,12 @@ class StationElevation(object):
                 self.points.append((vals[i], vals[i + 1]))
             line = next(geo_file)
         if DEBUG:
-            print('len(self.points)=', len(self.points), 'self.num_pts=', self.num_pts)
-            # print self.points
-        assert len(self.points) == self.num_pts
+            print('len(self.points)=', len(self.points), 'num_pts=', num_pts)
+        assert len(self.points) == num_pts
         return line
 
     def __str__(self):
-        s = '#Sta/Elev= ' + str(self.num_pts) + ' \n'
+        s = '#Sta/Elev= ' + str(len(self.points)) + ' \n'
         # unpack tuples
         sta_elev_list = [x for tup in self.points for x in tup]
         # convert to padded columns of 8
@@ -497,6 +489,7 @@ class CrossSection(object):
         # used to define n-values in the channel only (i.e. between the bank stations)
         # gets defined in define_channel_n
         self.channel_n = None
+        self.is_interpolated = None
         
     def import_geo(self, line, geo_file):
         while line != '\n':
