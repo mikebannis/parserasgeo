@@ -13,7 +13,17 @@ class Boundary(Feature):
         self.header = Header()
         self.interval = Interval()
         self.hydrograph = Hydrograph()
-        self.parts = [self.header, self.interval, self.hydrograph]
+        self.dss = DSS()
+        self.fixed_start = FixedStart()
+        self.critical = Critical()
+        self.parts = [
+            self.header,
+            self.interval,
+            self.hydrograph,
+            self.dss,
+            self.fixed_start,
+            self.critical,
+        ]
         self.uflow_list = []  # holds all parts and unknown lines (as strings)
 
     @staticmethod
@@ -32,10 +42,7 @@ class Boundary(Feature):
         return line
 
     def __str__(self):
-        s = ""
-        for line in self.uflow_list:
-            s += str(line)
-        return s + "\n"
+        return "".join((str(l) for l in self.uflow_list))
 
 
 class Header(Feature):
@@ -71,12 +78,11 @@ class Interval(Feature):
         return line.startswith("Interval=")
 
     def import_geo(self, line, infile):
-        self.interval = line.split("=")[1]
+        self.interval = line.split("=")[1].strip()
         return infile.readline()
 
     def __str__(self):
-        s = "Interval=" + self.interval
-        return s
+        return "Interval={}\n".format(self.interval)
 
 
 class Hydrograph(Feature):
@@ -105,3 +111,70 @@ class Hydrograph(Feature):
     def __str__(self):
         s = "Hydrograph=" + print_list_by_group(self.values, 8, 10)
         return s
+
+
+class DSS(Feature):
+    def __init__(self):
+        self.path = None
+        self.use_dss = None
+
+    @staticmethod
+    def test(line):
+        return line.startswith("DSS Path")
+
+    def import_geo(self, line, infile):
+        self.path = line.split("=")[1].strip()
+        line = infile.readline()
+        if line.startswith("Use DSS="):
+            self.use_dss = line.split("=")[1].strip().lower() == "true"
+            line = infile.readline()
+        return line
+
+    def __str__(self):
+        return "DSS Path={}\nUse DSS={}\n".format(self.path, self.use_dss)
+
+
+class FixedStart(Feature):
+    def __init__(self):
+        self.use_fixed_start = None
+        self.datetime = None
+
+    @staticmethod
+    def test(line):
+        return line.startswith("Use Fixed Start Time")
+
+    def import_geo(self, line, infile):
+        self.use_fixed_start = line.split("=")[1].strip().lower() == "true"
+        line = infile.readline()
+        if line.startswith("Fixed Start Date/Time="):
+            self.datetime = line.split("=")[1].strip()
+            line = infile.readline()
+        return line
+
+    def __str__(self):
+        return "Use Fixed Start Time={}\nFixed Start Date/Time={}\n".format(
+            self.use_fixed_start, self.datetime
+        )
+
+
+class Critical(Feature):
+    def __init__(self):
+        self.is_critical = None
+        self.flow = None
+
+    @staticmethod
+    def test(line):
+        return line.startswith("Is Critical Boundary")
+
+    def import_geo(self, line, infile):
+        self.is_critical = line.split("=")[1].strip().lower() == "true"
+        line = infile.readline()
+        if line.startswith("Critical Boundary Flow"):
+            self.flow = line.split("=")[1].strip()
+            line = infile.readline()
+        return line
+
+    def __str__(self):
+        return "Is Critical Boundary={}\nCritical Boundary Flow={}\n".format(
+            self.is_critical, self.flow
+        )

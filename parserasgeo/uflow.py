@@ -11,16 +11,15 @@ class UnsteadyFlow(object):
         self.uflow_list = []
 
         with open(filename, "rt") as infile:
-            while True:
-                line = infile.readline()
-                if not line:
-                    break
+            line = infile.readline()
+            while line:
                 if Boundary.test(line):
                     boundary = Boundary()
-                    boundary.import_geo(line, infile)
+                    line = boundary.import_geo(line, infile)
                     self.uflow_list.append(boundary)
                 else:  # Unknown line, add as text
                     self.uflow_list.append(line)
+                    line = infile.readline()
 
     def export(self, outfilename):
         """
