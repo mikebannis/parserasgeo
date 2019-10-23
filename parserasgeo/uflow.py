@@ -52,13 +52,15 @@ class UnsteadyFlow(object):
                     boundaries = (
                         bnd
                         for bnd in boundaries
-                        if bnd.header.station.value >= station_value[0]
+                        if bnd.header.station.value is not None
+                        and bnd.header.station.value >= station_value[0]
                     )
                 if station_value[1] is not None:
                     boundaries = (
                         bnd
                         for bnd in boundaries
-                        if bnd.header.station.value <= station_value[1]
+                        if bnd.header.station.value is not None
+                        and bnd.header.station.value <= station_value[1]
                     )
             else:
                 boundaries = (
